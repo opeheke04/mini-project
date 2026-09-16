@@ -1,60 +1,33 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
-// 1. Route Home
 Route::get('/', function () {
-    return view('layouts.home');
+    return view('welcome');
 });
 
-// 2. Route Tentang (Mengirim data string & akreditasi)
-Route::get('/tentang', function () {
-    $namaProdi = 'Teknik Informatika';
-    $jurusan = 'Teknologi Informasi';
-    $akreditasi = 'Baik Sekali';
-    $visi = 'Mencetak lulusan TI yang kompeten, inovatif, dan berdaya saing global.';
-    $misi = [
-        'Menyelenggarakan pendidikan berkualitas di bidang Teknologi Informasi.',
-        'Melakukan penelitian tepat guna untuk masyarakat dan industri.',
-        'Melaksanakan pengabdian kepada masyarakat berbasis ilmu pengetahuan dan teknologi.'
-    ];
+Route::get('/dashboard', function () {
+    $totalProducts = \App\Models\Product::count();
+    $activeProducts = \App\Models\Product::where('is_active', true)->count();
+    $inactiveProducts = \App\Models\Product::where('is_active', false)->count();
+    $stockProducts = \App\Models\Product::sum('stock');
 
-    return view('layouts.tentang', compact('namaProdi', 'jurusan', 'akreditasi', 'visi', 'misi'));
+    return view('dashboard', compact(
+        'totalProducts',
+        'activeProducts',
+        'inactiveProducts',
+        'stockProducts'
+    ));
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::resource('products', ProductController::class);
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// 3. Route Dosen (Mengirim array data dosen)
-Route::get('/dosen', function () {
-    $dosen = [
-        [
-            'nama' => 'Budi Santoso',
-            'nidn' => '0012345678',
-            'jabatan' => 'Dosen'
-        ],
-        [
-            'nama' => 'Siti Aminah',
-            'nidn' => '0012345679',
-            'jabatan' => 'Dosen'
-        ],
-        [
-            'nama' => 'Andi Wijaya',
-            'nidn' => '0012345680',
-            'jabatan' => 'Ketua Program Studi'
-        ],
-    ];
-
-    return view('layouts.dosen', compact('dosen'));
-});
-
-// 4. Route Detail Dosen (Route Parameter)
-Route::get('/dosen/{nama}', function ($nama) {
-    return view('layouts.detail-dosen', compact('nama'));
-});
-
-// 5. Route Kontak
-Route::get('/kontak', function () {
-    $email = 'ti@politeknik.ac.id';
-    $telepon = '(0341) 551611';
-    $alamat = 'Jl. Soekarno Hatta No. 9, Malang';
-
-    return view('layouts.kontak', compact('email', 'telepon', 'alamat'));
-});
+require __DIR__.'/auth.php';
