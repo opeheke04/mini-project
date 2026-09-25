@@ -63,3 +63,129 @@ body {
 .btn-warning {
     @apply inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2 text-xs font-bold text-white shadow-[0_8px_20px_rgba(59,130,246,0.28)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:from-blue-700 hover:to-indigo-700 hover:shadow-[0_12px_24px_rgba(59,130,246,0.35)] focus:outline-none focus:ring-4 focus:ring-blue-200 active:translate-y-0 dark:border-indigo-700 dark:focus:ring-blue-900;
 }
+
+.glass-panel {
+    @apply rounded-2xl border border-white/60 bg-white/70 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-sm;
+}
+
+.hero-ring {
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.4), 0 25px 80px rgba(37, 99, 235, 0.15);
+}
+
+.cashier-page {
+    position: relative;
+}
+
+.cashier-page::before {
+    content: '';
+    position: absolute;
+    inset: 1rem 0 auto;
+    height: 18rem;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 76% 18%, rgba(99, 102, 241, 0.12), transparent 42%), radial-gradient(circle at 12% 0%, rgba(14, 165, 233, 0.1), transparent 38%);
+}
+
+.cashier-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+.cashier-header {
+    border-left: 4px solid rgb(37 99 235);
+    padding-left: 1rem;
+}
+
+.transaction-ticket {
+    border: 1px dashed rgb(148 163 184 / 0.7);
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.7);
+    padding: 0.75rem 1rem;
+}
+
+.payment-summary-card,
+.payment-card {
+    box-shadow: 0 18px 42px rgb(30 41 59 / 0.09);
+}
+
+.payment-card {
+    border-color: rgb(147 197 253 / 0.65);
+}
+
+.payment-field {
+    @apply flex items-center overflow-hidden rounded-xl border border-blue-200 bg-blue-50/70 pl-4 shadow-sm transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100;
+}
+
+.payment-field span {
+    @apply text-sm font-black text-blue-500;
+}
+
+.summary-row {
+    @apply flex items-center justify-between gap-4 text-sm text-slate-500;
+}
+
+.summary-row strong {
+    @apply text-right font-bold text-slate-800;
+}
+
+.summary-input {
+    @apply w-28 rounded-lg border-slate-200 bg-slate-50 px-3 py-2 text-right text-sm font-bold text-slate-800 focus:border-blue-500 focus:ring-blue-500;
+}
+
+.payment-method {
+    @apply rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600 transition hover:border-blue-300 hover:text-blue-700;
+}
+
+.payment-method.active {
+    @apply border-blue-600 bg-blue-600 text-white shadow-sm;
+}
+
+.btn-success {
+    @apply inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black uppercase tracking-[0.12em] text-white shadow-[0_12px_24px_rgba(5,150,105,0.24)] transition hover:-translate-y-0.5 hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-200;
+}
+
+.product-result {
+    @apply flex w-full items-center justify-between gap-4 rounded-lg px-3 py-3 text-left text-sm transition hover:bg-blue-50;
+}
+
+.product-result small {
+    @apply mt-1 block text-xs font-normal text-slate-400;
+}
+
+.qty-control {
+    @apply mx-auto flex w-fit items-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50;
+}
+
+.qty-control button {
+    @apply h-8 w-8 font-bold text-slate-500 transition hover:bg-blue-600 hover:text-white;
+}
+
+.qty-control span {
+    @apply flex h-8 min-w-8 items-center justify-center border-x border-slate-200 px-2 text-xs font-bold text-slate-700;
+}
+
+.remove-item {
+    @apply text-xl font-bold leading-none text-slate-300 transition hover:text-rose-600;
+}
+
+.empty-cart {
+    @apply px-5 py-16 text-center text-sm text-slate-400;
+}
+
+.empty-cart span {
+    @apply text-xs text-slate-300;
+}
+
+#changeBox.short-payment {
+    @apply bg-rose-50 text-rose-700;
+}
+
+@media (max-width: 639px) {
+    .cashier-header {
+        padding-left: 0.75rem;
+    }
+
+    .transaction-ticket {
+        width: 100%;
+    }
+}

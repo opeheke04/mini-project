@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CashierController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/cashier', [CashierController::class, 'index'])->name('cashier.index');
     Route::resource('products', ProductController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -15,6 +15,9 @@
                     <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
                         {{ __('Products') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('cashier.index')" :active="request()->routeIs('cashier.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
+                        {{ __('Kasir') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -65,6 +68,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                 {{ __('Products') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('cashier.index')" :active="request()->routeIs('cashier.*')">
+                {{ __('Kasir') }}
             </x-responsive-nav-link>
         </div>
 

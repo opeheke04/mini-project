@@ -29,6 +29,8 @@
             <main class="pb-10">
                 {{ $slot }}
             </main>
+
+            @stack('scripts')
         </div>
     </body>
 </html>
