@@ -9,12 +9,14 @@
                 </div>
 
                 <div class="hidden space-x-1 sm:-my-px sm:ms-8 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
-                        {{ __('Products') }}
-                    </x-nav-link>
+                    @if (Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
+                            {{ __('Products') }}
+                        </x-nav-link>
+                    @endif
                     <x-nav-link :href="route('cashier.index')" :active="request()->routeIs('cashier.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
                         {{ __('Kasir') }}
                     </x-nav-link>
@@ -63,12 +65,14 @@
 
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="space-y-1 pb-3 pt-2">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
-                {{ __('Products') }}
-            </x-responsive-nav-link>
+            @if (Auth::user()->role === 'admin')
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
+                    {{ __('Products') }}
+                </x-responsive-nav-link>
+            @endif
             <x-responsive-nav-link :href="route('cashier.index')" :active="request()->routeIs('cashier.*')">
                 {{ __('Kasir') }}
             </x-responsive-nav-link>

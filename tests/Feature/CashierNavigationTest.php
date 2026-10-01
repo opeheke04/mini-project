@@ -13,7 +13,7 @@ class CashierNavigationTest extends TestCase
 
     public function test_authenticated_user_can_open_cashier_page(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'kasir']);
         Product::factory()->create([
             'name' => 'Indomie Goreng',
             'price' => 3500,
@@ -35,5 +35,12 @@ class CashierNavigationTest extends TestCase
     public function test_guest_is_redirected_from_cashier_page(): void
     {
         $this->get('/cashier')->assertRedirect('/login');
+    }
+
+    public function test_admin_can_open_cashier_page(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($user)->get('/cashier')->assertOk();
     }
 }

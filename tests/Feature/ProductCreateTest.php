@@ -12,7 +12,7 @@ class ProductCreateTest extends TestCase
 
     public function test_user_can_create_a_product(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
 
         $response = $this
             ->actingAs($user)

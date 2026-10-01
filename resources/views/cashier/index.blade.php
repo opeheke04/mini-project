@@ -14,15 +14,18 @@
         </div>
     </x-slot>
 
-    <div class="cashier-page mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
+    <div class="cashier-page mx-auto max-w-[1600px] px-4 py-7 sm:px-6 lg:px-8">
         <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
             <section class="space-y-6">
-                <div class="panel-surface overflow-visible">
-                    <div class="border-b border-slate-100 px-5 py-4">
+                <div class="panel-surface search-panel overflow-visible">
+                    <div class="panel-heading border-b border-slate-100 px-5 py-4">
                         <div class="flex items-center justify-between gap-4">
-                            <div>
+                            <div class="flex items-start gap-3">
+                                <span class="heading-icon bg-blue-600 text-white">+</span>
+                                <div>
                                 <h3 class="font-black text-slate-900">Tambah Barang</h3>
                                 <p class="mt-1 text-xs text-slate-500">Gunakan nama barang, kode, atau barcode.</p>
+                                </div>
                             </div>
                             <span class="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">F2 Cari</span>
                         </div>
@@ -54,11 +57,14 @@
                     </div>
                 </div>
 
-                <div class="panel-surface overflow-hidden">
+                <div class="panel-surface cart-panel overflow-hidden">
                     <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-                        <div>
-                            <h3 class="font-black text-slate-900">Keranjang Belanja</h3>
+                        <div class="flex items-start gap-3">
+                            <span class="heading-icon bg-amber-100 text-amber-700">▣</span>
+                            <div>
+                                <h3 class="font-black text-slate-900">Keranjang Belanja</h3>
                             <p class="mt-1 text-xs text-slate-500">Atur jumlah barang sebelum pembayaran.</p>
+                            </div>
                         </div>
                         <span id="itemCount" class="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">0 Item</span>
                     </div>
@@ -82,7 +88,8 @@
 
             <aside class="space-y-6 xl:sticky xl:top-6 xl:self-start">
                 <div class="panel-surface payment-summary-card overflow-hidden">
-                    <div class="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50/70 px-5 py-4">
+                    <div class="payment-card-heading border-b border-slate-100 px-5 py-4">
+                        <span class="soft-label mb-2">Ringkas & jelas</span>
                         <h3 class="font-black text-slate-900">Ringkasan Pembayaran</h3>
                     </div>
                     <div class="space-y-4 p-5">
@@ -101,7 +108,8 @@
                 </div>
 
                 <div class="panel-surface payment-card overflow-hidden">
-                    <div class="border-b border-slate-100 bg-gradient-to-r from-blue-50 to-indigo-50 px-5 py-4">
+                    <div class="payment-card-heading border-b border-slate-100 px-5 py-4">
+                        <span class="soft-label mb-2">Langkah terakhir</span>
                         <h3 class="font-black text-slate-900">Pembayaran</h3>
                     </div>
                     <div class="space-y-5 p-5">
@@ -149,6 +157,7 @@
     @push('scripts')
         <script>
             window.cashierProducts = @json($products);
+            window.cashierTransactionUrl = @json(route('cashier.transactions.store'));
         </script>
         @vite('resources/js/cashier.js')
     @endpush

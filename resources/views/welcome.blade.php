@@ -30,7 +30,9 @@
                         <div class="flex items-center gap-3">
                             @auth
                                 <a href="{{ route('dashboard') }}" class="btn-secondary">Dashboard</a>
-                                <a href="{{ route('products.index') }}" class="btn-primary">Products</a>
+                                @if (Route::has('products.index'))
+                                    <a href="{{ route('products.index') }}" class="btn-primary">Products</a>
+                                @endif
                             @else
                                 <a href="{{ route('login') }}" class="btn-secondary">Login</a>
                                 @if (Route::has('register'))
@@ -55,7 +57,9 @@
                     <div class="mt-8 flex flex-wrap gap-3">
                         @auth
                             <a href="{{ route('dashboard') }}" class="btn-primary">Masuk Dashboard</a>
-                            <a href="{{ route('products.index') }}" class="btn-secondary">Lihat Produk</a>
+                            @if (Route::has('products.index'))
+                                <a href="{{ route('products.index') }}" class="btn-secondary">Lihat Produk</a>
+                            @endif
                         @else
                             <a href="{{ route('login') }}" class="btn-primary">Login Sekarang</a>
                             <a href="{{ route('register') }}" class="btn-secondary">Daftar</a>

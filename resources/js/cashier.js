@@ -133,11 +133,45 @@ document.getElementById('cancelButton').addEventListener('click', () => {
 document.getElementById('holdButton').addEventListener('click', () => {
     window.alert(cart.length ? 'Transaksi berhasil ditahan untuk sementara.' : 'Tidak ada transaksi untuk ditahan.');
 });
-document.getElementById('payButton').addEventListener('click', () => {
-    const total = getTotal().total;
+document.getElementById('payButton').addEventListener('click', async (event) => {
+    const button = event.currentTarget;
     if (!cart.length) return window.alert('Keranjang masih kosong.');
-    if (valueOf('payment') < total) return window.alert('Uang pembayaran masih kurang.');
-    window.alert(`Pembayaran ${paymentMethod} berhasil.\nTotal: ${rupiah(total)}\nKembalian: ${rupiah(valueOf('payment') - total)}`);
+    if (valueOf('payment') < getTotal().total) return window.alert('Uang pembayaran masih kurang.');
+
+    button.disabled = true;
+    try {
+        const response = await fetch(window.cashierTransactionUrl, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({
+                items: cart.map((item) => ({ product_id: item.id, quantity: item.qty })),
+                customer_type: document.getElementById('customerType').value,
+                customer_contact: document.getElementById('customerContact').value,
+                discount_percent: valueOf('discountPercent'),
+                discount_amount: valueOf('discountAmount'),
+                tax: valueOf('tax'),
+                other_fee: valueOf('otherFee'),
+                amount_paid: valueOf('payment'),
+                payment_method: paymentMethod,
+            }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            const firstError = Object.values(result.errors || {}).flat()[0];
+            throw new Error(firstError || result.message || 'Transaksi gagal disimpan.');
+        }
+
+        window.alert(`${result.message}\nNo. Transaksi: ${result.transaction.number}\nTotal: ${rupiah(result.transaction.total)}\nKembalian: ${rupiah(result.transaction.change)}`);
+        resetTransaction();
+    } catch (error) {
+        window.alert(error.message || 'Tidak dapat menghubungi server.');
+    } finally {
+        button.disabled = false;
+    }
 });
 document.addEventListener('keydown', (event) => {
     if (event.key === 'F2') { event.preventDefault(); searchInput.focus(); }

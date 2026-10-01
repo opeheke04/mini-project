@@ -10,10 +10,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        // Tambahkan middleware global di sini jika dibutuhkan.
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\Admin::class,
+            'cek.role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        // Tambahkan handling exception custom di sini jika dibutuhkan.
-    })
-    ->create();
+    ->withExceptions(function (Exceptions $exceptions) {
+        //
+    })->create();
