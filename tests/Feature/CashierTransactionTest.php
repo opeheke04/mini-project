@@ -31,7 +31,8 @@ class CashierTransactionTest extends TestCase
 
         $response->assertCreated()
             ->assertJsonPath('transaction.total', '25000.00')
-            ->assertJsonPath('transaction.change', '5000.00');
+            ->assertJsonPath('transaction.change', '5000.00')
+            ->assertJsonPath('transaction.print_url', route('cashier.receipt.preview', Sale::first()));
 
         $this->assertDatabaseHas('sales', [
             'user_id' => $user->id,

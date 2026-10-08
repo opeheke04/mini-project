@@ -20,7 +20,7 @@ class ProductNavigationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Products');
+            ->assertSee('Produk');
     }
 
     public function test_cashier_cannot_open_product_pages(): void

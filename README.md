@@ -1,59 +1,94 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Minimarket POS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel point-of-sale and inventory application for a small minimarket. It includes product management, role-protected admin pages, and a cashier workflow for recording sales and updating stock.
 
-## About Laravel
+## Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.2 or newer with the extensions required by Laravel
+- Composer
+- Node.js and npm
+- MySQL/MariaDB (or another Laravel-supported database)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Local setup
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+From the project directory:
 
-## Learning Laravel
+```powershell
+composer install
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+php artisan key:generate
+npm install
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Configure the database connection in `.env`. For the default XAMPP MySQL setup, set `DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE` to an existing database, and your local MySQL username/password.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Before creating initial user accounts, set these values in `.env`:
 
-## Laravel Sponsors
+- `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD`
+- `INITIAL_CASHIER_EMAIL` and `INITIAL_CASHIER_PASSWORD`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Use different, unique passwords of at least 16 characters. The initial account credentials are intentionally not provided by default. The seeder updates these two accounts to the configured values when it runs, so remove the password values from `.env` after bootstrapping accounts if you do not want future seed runs to reset them. Never commit `.env` or share these values.
 
-### Premium Partners
+Run the database migrations and seed initial accounts/products:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```powershell
+php artisan migrate
+php artisan db:seed
+```
 
-## Contributing
+The seeder warns and skips initial account creation if the initial email/password values are missing. It still seeds sample products. Existing databases may still contain the old demo accounts; change or remove those passwords before deploying.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Build frontend assets and start the application:
 
-## Code of Conduct
+```powershell
+npm run build
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Open the URL shown by Artisan (normally `http://127.0.0.1:8000`). For frontend development with Vite hot reload, run `npm run dev` in a second terminal alongside `php artisan serve`; use `npm run build` for production assets.
 
-## Security Vulnerabilities
+## Roles and main routes
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- Admins can access `/admin/dashboard` and `/products`.
+- Admins can access `/sales` for searchable transaction history, transaction details, and daily/monthly sales summaries.
+- Admins and cashiers can access `/cashier` and record transactions.
+- The `admin` and `cek.role` middleware enforce the role restrictions.
+- Public registration is disabled. Admins can create cashier accounts from the **Akun Kasir** menu; new accounts require a password of at least 16 characters containing letters and numbers.
 
-## License
+## Low-stock alerts
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The dashboard, product list, and cashier screen flag active products with stock at or below `LOW_STOCK_THRESHOLD`. The default is 5 units. Set that environment variable to another non-negative whole number and clear the config cache after changing it:
+
+```powershell
+php artisan config:clear
+```
+
+The product list warning opens a filtered view of low-stock products.
+
+## Production checklist
+
+- Set `APP_ENV=production` and `APP_DEBUG=false` in the deployment environment. `APP_DEBUG` defaults to false; do not enable it on a public server.
+- Use a fresh production-only `APP_KEY`, unique admin/cashier email addresses and long, different passwords. Do not deploy the local `.env`, demo accounts, or passwords.
+- Configure a least-privilege database user, HTTPS, secure session cookies (`SESSION_SECURE_COOKIE=true`), and a real mail transport before enabling password reset.
+- Keep `.env` private, restrict access to database backups, and regularly test restoring a backup before relying on it.
+- After setting production environment values, run `php artisan config:cache`, `php artisan route:cache`, and `php artisan view:cache`. Run `php artisan optimize:clear` before changing those values.
+
+### Back up XAMPP MySQL/MariaDB on Windows
+
+From the project root, run the included PowerShell script. It creates a timestamped SQL dump under the private `storage\app\private\database-backups` directory (ignored by Git). `mysqldump` prompts for the database password. For the default local XAMPP root account with no password, pass `-NoPassword`.
+
+```powershell
+.\scripts\backup-database.ps1 -DatabaseName minimarket -DatabaseUser root -NoPassword
+```
+
+Pass `-MysqldumpPath`, `-DatabaseHost`, or `-DatabasePort` if your XAMPP/MySQL installation uses different values. Copy backups to encrypted off-site storage and apply a retention policy; keeping the only backup on the database machine does not protect against disk loss.
+
+## Tests
+
+Run the test suite with:
+
+```powershell
+php artisan test
+```
+
+The test environment uses an in-memory SQLite database and does not require access to the local MySQL database.

@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -21,8 +21,8 @@
                             <x-application-logo class="h-6 w-6 fill-current" />
                         </div>
                         <div>
-                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-600">Profile Prodi</p>
-                            <h1 class="text-lg font-black text-slate-800">Product Management</h1>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-amber-700">Retail operations</p>
+                            <h1 class="text-lg font-black text-slate-800">{{ config('app.name') }}</h1>
                         </div>
                     </div>
 
@@ -35,9 +35,6 @@
                                 @endif
                             @else
                                 <a href="{{ route('login') }}" class="btn-secondary">Login</a>
-                                @if (Route::has('register'))
-                                    <a href="{{ route('register') }}" class="btn-primary">Register</a>
-                                @endif
                             @endauth
                         </div>
                     @endif
@@ -46,12 +43,12 @@
 
             <main class="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
                 <div class="max-w-xl">
-                    <span class="soft-label">Inventory System</span>
+                    <span class="soft-label">Minimarket · Point of Sale</span>
                     <h2 class="mt-5 text-4xl font-black leading-tight text-slate-900 sm:text-5xl">
-                        Kelola produk dengan lebih efisien.
+                        Kelola toko dengan lebih efisien.
                     </h2>
                     <p class="mt-5 text-lg text-slate-600">
-                        Pantau stok, lihat status produk, dan kelola katalog Anda dari satu dashboard yang rapi dan profesional.
+                        Pantau stok, kelola katalog, dan layani transaksi pelanggan dari satu sistem yang rapi dan profesional.
                     </p>
 
                     <div class="mt-8 flex flex-wrap gap-3">
@@ -62,7 +59,6 @@
                             @endif
                         @else
                             <a href="{{ route('login') }}" class="btn-primary">Login Sekarang</a>
-                            <a href="{{ route('register') }}" class="btn-secondary">Daftar</a>
                         @endif
                     </div>
 

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" fill="none">
+  <defs>
+    <linearGradient id="panel" x1="85" y1="40" x2="820" y2="510" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8F3E9"/>
+      <stop offset="1" stop-color="#E9E5D9"/>
+    </linearGradient>
+    <linearGradient id="bag" x1="320" y1="180" x2="620" y2="450" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5C76B"/>
+      <stop offset="1" stop-color="#D99535"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="245" y1="117" x2="325" y2="346" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C9E6D2"/>
+      <stop offset="1" stop-color="#7CB99A"/>
+    </linearGradient>
+    <filter id="shadow" x="120" y="77" width="660" height="414" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+  <rect x="34" y="28" width="832" height="484" rx="34" fill="url(#panel)"/>
+  <circle cx="737" cy="113" r="55" fill="#E6D5B4" fill-opacity=".42"/>
+  <circle cx="737" cy="113" r="35" fill="#F9F3E6"/>
+  <path d="M90 384c81-51 135-68 212-55 63 10 104 47 164 42 86-7 124-75 226-74 78 1 116 27 150 57v112H90V384Z" fill="#D9E0D5"/>
+  <ellipse cx="452" cy="438" rx="284" ry="31" fill="#233044" fill-opacity=".2" filter="url(#shadow)"/>
+
+  <!-- Fresh produce -->
+  <path d="M215 206c-21-39-6-81 24-105 8 34 11 67-24 105Z" fill="#608B63"/>
+  <path d="M238 209c-4-41 20-74 57-85-1 36-14 68-57 85Z" fill="#7DA66F"/>
+  <path d="M244 227c-34-26-74-20-99 4 32 17 66 22 99-4Z" fill="#A5BC78"/>
+  <path d="M200 220c22-8 41-7 59 5" stroke="#456D53" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="188" cy="283" r="47" fill="#E68A3D"/>
+  <path d="M181 234c6-14 19-19 31-16-5 13-15 20-31 16Z" fill="#547D58"/>
+  <path d="M154 276c13-15 26-25 42-30m-36 58c13-15 28-25 48-31" stroke="#F4B56A" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Bottle -->
+  <path d="M279 132h35v31l18 23v151c0 16-13 29-29 29h-13c-16 0-29-13-29-29V186l18-23v-31Z" fill="url(#glass)" stroke="#54866E" stroke-width="4"/>
+  <path d="M278 131h37v-22c0-8-6-14-14-14h-9c-8 0-14 6-14 14v22Z" fill="#D8B36A"/>
+  <rect x="268" y="234" width="57" height="65" rx="9" fill="#F5F0DF"/>
+  <path d="M281 257h30m-30 12h23" stroke="#759476" stroke-width="5" stroke-linecap="round"/>
+  <path d="M263 194h70" stroke="#EAF6ED" stroke-opacity=".8" stroke-width="5"/>
+
+  <!-- Paper grocery bag -->
+  <path d="M358 242h265l-24 198H381l-23-198Z" fill="url(#bag)" stroke="#BE7D2D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M418 248v-36c0-36 24-61 72-61s72 25 72 61v36" stroke="#B9782B" stroke-width="14" stroke-linecap="round"/>
+  <path d="M433 244v-31c0-27 17-44 57-44s57 17 57 44v31" stroke="#F1C778" stroke-width="7" stroke-linecap="round"/>
+  <path d="M457 322h67" stroke="#FFF3D8" stroke-opacity=".75" stroke-width="8" stroke-linecap="round"/>
+  <path d="M481 345h18" stroke="#FFF3D8" stroke-opacity=".75" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Pantry pack -->
+  <path d="M610 176h91l12 62v120c0 12-10 22-22 22h-70c-12 0-22-10-22-22V238l11-62Z" fill="#F2E7CC" stroke="#A99067" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M615 177v-21c0-7 6-13 13-13h54c7 0 13 6 13 13v21" fill="#D1A95F" stroke="#A99067" stroke-width="4"/>
+  <rect x="608" y="246" width="95" height="69" rx="8" fill="#FFF9EA"/>
+  <path d="M630 266h50m-39 15h28" stroke="#BC9651" stroke-width="5" stroke-linecap="round"/>
+  <path d="M654 191v37" stroke="#FFF9EA" stroke-opacity=".8" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Small jar -->
+  <path d="M716 270h70v93c0 14-11 25-25 25h-20c-14 0-25-11-25-25v-93Z" fill="#D9A979" stroke="#A8754D" stroke-width="4"/>
+  <path d="M711 259c0-7 6-13 13-13h54c7 0 13 6 13 13v12h-80v-12Z" fill="#8B644B"/>
+  <rect x="724" y="299" width="54" height="42" rx="7" fill="#F8EBD2"/>
+  <path d="M738 314h26m-19 10h12" stroke="#A8754D" stroke-width="4" stroke-linecap="round"/>
+
+  <path d="M127 432h646" stroke="#71816E" stroke-opacity=".3" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="150" cy="154" r="6" fill="#D59A4A"/>
+  <circle cx="754" cy="208" r="5" fill="#82956F"/>
+  <path d="m742 386 7 14 15 7-15 7-7 14-7-14-15-7 15-7 7-14Z" fill="#C99248" fill-opacity=".72"/>
+</svg>

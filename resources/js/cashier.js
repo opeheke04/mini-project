@@ -4,6 +4,66 @@ const resultsBox = document.getElementById('productResults');
 const cartBody = document.getElementById('cartBody');
 let cart = [];
 let paymentMethod = 'Tunai';
+const heldStorageKey = window.cashierHeldStorageKey;
+let heldTransactions = [];
+
+function readHeldTransactions() {
+    try {
+        const stored = window.localStorage.getItem(heldStorageKey);
+        if (!stored) return [];
+
+        const parsed = JSON.parse(stored);
+        if (!Array.isArray(parsed)) throw new Error('Format transaksi ditahan tidak valid.');
+        return parsed;
+    } catch (error) {
+        console.error('Could not read held cashier transactions:', error);
+        window.alert('Transaksi ditahan tidak dapat dibaca dari penyimpanan browser. Data tidak dihapus.');
+        return [];
+    }
+}
+
+function saveHeldTransactions(transactions) {
+    try {
+        window.localStorage.setItem(heldStorageKey, JSON.stringify(transactions));
+        heldTransactions = transactions;
+        renderHeldTransactions();
+        return true;
+    } catch (error) {
+        console.error('Could not save held cashier transactions:', error);
+        window.alert('Transaksi tidak dapat ditahan. Penyimpanan browser penuh atau tidak tersedia.');
+        return false;
+    }
+}
+
+function renderHeldTransactions() {
+    const select = document.getElementById('heldTransactionsSelect');
+    const selectedId = select.value;
+    select.replaceChildren();
+
+    if (!heldTransactions.length) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'Tidak ada transaksi ditahan';
+        select.append(option);
+    } else {
+        heldTransactions.forEach((transaction) => {
+            const option = document.createElement('option');
+            option.value = transaction.id;
+            const itemCount = transaction.cart.reduce((sum, item) => sum + item.qty, 0);
+            const date = new Date(transaction.heldAt).toLocaleString('id-ID');
+            option.textContent = `${date} · ${itemCount} item · ${rupiah(transaction.total)}`;
+            select.append(option);
+        });
+        if (heldTransactions.some((transaction) => transaction.id === selectedId)) {
+            select.value = selectedId;
+        }
+    }
+
+    document.getElementById('heldTransactionCount').textContent = heldTransactions.length;
+    const hasSelection = Boolean(select.value);
+    document.getElementById('resumeHeldButton').disabled = !hasSelection;
+    document.getElementById('deleteHeldButton').disabled = !hasSelection;
+}
 
 const rupiah = (value) => new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -131,13 +191,116 @@ document.getElementById('cancelButton').addEventListener('click', () => {
     if (cart.length && window.confirm('Batalkan transaksi ini?')) resetTransaction();
 });
 document.getElementById('holdButton').addEventListener('click', () => {
-    window.alert(cart.length ? 'Transaksi berhasil ditahan untuk sementara.' : 'Tidak ada transaksi untuk ditahan.');
+    if (!cart.length) {
+        window.alert('Tidak ada transaksi untuk ditahan.');
+        return;
+    }
+
+    const totals = getTotal();
+    const held = {
+        id: window.crypto.randomUUID(),
+        heldAt: new Date().toISOString(),
+        cart,
+        customerType: document.getElementById('customerType').value,
+        customerContact: document.getElementById('customerContact').value,
+        discountPercent: valueOf('discountPercent'),
+        discountAmount: valueOf('discountAmount'),
+        tax: valueOf('tax'),
+        otherFee: valueOf('otherFee'),
+        amountPaid: document.getElementById('payment').value,
+        paymentMethod,
+        total: totals.total,
+    };
+
+    if (!saveHeldTransactions([...heldTransactions, held])) return;
+    resetTransaction();
+    document.getElementById('heldTransactionsSelect').value = held.id;
+    renderHeldTransactions();
+    window.alert('Transaksi berhasil ditahan. Buka kembali dari daftar Transaksi Ditahan.');
 });
+
+document.getElementById('resumeHeldButton').addEventListener('click', () => {
+    if (cart.length) {
+        window.alert('Tahan atau batalkan transaksi aktif sebelum membuka transaksi yang ditahan.');
+        return;
+    }
+
+    const heldId = document.getElementById('heldTransactionsSelect').value;
+    const held = heldTransactions.find((transaction) => transaction.id === heldId);
+    if (!held) return;
+
+    cart = held.cart;
+    document.getElementById('customerType').value = held.customerType || 'Umum';
+    document.getElementById('customerContact').value = held.customerContact || '';
+    document.getElementById('discountPercent').value = held.discountPercent ?? 0;
+    document.getElementById('discountAmount').value = held.discountAmount ?? 0;
+    document.getElementById('tax').value = held.tax ?? 0;
+    document.getElementById('otherFee').value = held.otherFee ?? 0;
+    document.getElementById('payment').value = held.amountPaid || '';
+    paymentMethod = held.paymentMethod || 'Tunai';
+    document.querySelectorAll('.payment-method').forEach((button) => {
+        button.classList.toggle('active', button.dataset.method === paymentMethod);
+    });
+
+    if (!saveHeldTransactions(heldTransactions.filter((transaction) => transaction.id !== heldId))) {
+        cart = [];
+        return;
+    }
+    renderCart();
+    searchInput.focus();
+    window.alert('Transaksi berhasil dibuka kembali. Periksa ketersediaan stok sebelum pembayaran.');
+});
+
+document.getElementById('deleteHeldButton').addEventListener('click', () => {
+    const select = document.getElementById('heldTransactionsSelect');
+    const heldId = select.value;
+    const held = heldTransactions.find((transaction) => transaction.id === heldId);
+    if (!held) return;
+
+    if (!window.confirm('Hapus transaksi yang ditahan ini?')) return;
+    saveHeldTransactions(heldTransactions.filter((transaction) => transaction.id !== heldId));
+});
+
+document.getElementById('heldTransactionsSelect').addEventListener('change', renderHeldTransactions);
+window.addEventListener('storage', (event) => {
+    if (event.key !== heldStorageKey) return;
+    heldTransactions = readHeldTransactions();
+    renderHeldTransactions();
+});
+async function printReceipt(transactionId, receiptWindow, previewUrl) {
+    if (!transactionId || !window.cashierReceiptUrl) {
+        if (receiptWindow) receiptWindow.close();
+        return;
+    }
+
+    const receiptUrl = window.cashierReceiptUrl.replace(/\/0$/, `/${transactionId}`);
+    try {
+        const response = await fetch(receiptUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+        });
+        const result = response.ok ? await response.json() : {};
+        if (result.status === 'success') {
+            if (receiptWindow) receiptWindow.close();
+            return;
+        }
+    } catch (error) {
+        console.warn('Receipt print skipped:', error);
+    }
+
+    if (receiptWindow && previewUrl) {
+        receiptWindow.location.href = previewUrl;
+    }
+}
+
 document.getElementById('payButton').addEventListener('click', async (event) => {
     const button = event.currentTarget;
     if (!cart.length) return window.alert('Keranjang masih kosong.');
     if (valueOf('payment') < getTotal().total) return window.alert('Uang pembayaran masih kurang.');
 
+    const receiptWindow = window.open('about:blank', '_blank');
     button.disabled = true;
     try {
         const response = await fetch(window.cashierTransactionUrl, {
@@ -165,9 +328,14 @@ document.getElementById('payButton').addEventListener('click', async (event) => 
             throw new Error(firstError || result.message || 'Transaksi gagal disimpan.');
         }
 
+        await printReceipt(result.transaction.id, receiptWindow, result.transaction.print_url);
+        if (!receiptWindow) {
+            window.alert('Transaksi berhasil. Izinkan pop-up browser untuk mencetak struk, atau cetak ulang dari detail transaksi.');
+        }
         window.alert(`${result.message}\nNo. Transaksi: ${result.transaction.number}\nTotal: ${rupiah(result.transaction.total)}\nKembalian: ${rupiah(result.transaction.change)}`);
         resetTransaction();
     } catch (error) {
+        if (receiptWindow) receiptWindow.close();
         window.alert(error.message || 'Tidak dapat menghubungi server.');
     } finally {
         button.disabled = false;
@@ -182,4 +350,6 @@ document.addEventListener('click', (event) => {
     if (!event.target.closest('#searchProduct, #productResults, #searchButton')) resultsBox.classList.add('hidden');
 });
 
+heldTransactions = readHeldTransactions();
+renderHeldTransactions();
 renderCart();

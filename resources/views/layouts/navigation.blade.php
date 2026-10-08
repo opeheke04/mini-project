@@ -1,23 +1,32 @@
-<nav x-data="{ open: false }" class="border-b border-slate-200/80 bg-white/80 shadow-[0_8px_24px_rgba(15,23,42,0.04)] backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80">
+<nav x-data="{ open: false }" class="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 shadow-[0_8px_24px_rgba(15,23,42,0.04)] backdrop-blur-xl">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between">
             <div class="flex">
                 <div class="flex shrink-0 items-center">
-                    <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 p-2.5 text-white shadow-[0_10px_25px_rgba(37,99,235,0.35)]">
-                        <x-application-logo class="block h-7 w-auto fill-current" />
+                    <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-3">
+                        <span class="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 p-2.5 text-amber-300 shadow-[0_10px_25px_rgba(15,23,42,0.25)]">
+                            <x-application-logo class="block h-7 w-7" />
+                        </span>
+                        <span class="hidden text-sm font-black uppercase tracking-[0.14em] text-slate-800 sm:block">{{ config('app.name') }}</span>
                     </a>
                 </div>
 
                 <div class="hidden space-x-1 sm:-my-px sm:ms-8 sm:flex">
                     @if (Auth::user()->role === 'admin')
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-800">
                             {{ __('Dashboard') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
-                            {{ __('Products') }}
+                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-800">
+                            {{ __('Produk') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-700 dark:text-slate-300 dark:hover:text-white">
+                            {{ __('Penjualan') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.cashier-accounts.index')" :active="request()->routeIs('admin.cashier-accounts.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-700">
+                            {{ __('Akun Kasir') }}
                         </x-nav-link>
                     @endif
-                    <x-nav-link :href="route('cashier.index')" :active="request()->routeIs('cashier.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-blue-700 dark:text-slate-300 dark:hover:text-white">
+                    <x-nav-link :href="route('cashier.index')" :active="request()->routeIs('cashier.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-800">
                         {{ __('Kasir') }}
                     </x-nav-link>
                 </div>
@@ -26,7 +35,7 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:text-blue-300">
+                        <button class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-300 hover:text-amber-900">
                             <div>{{ Auth::user()->name }}</div>
                             <div class="ms-1">
                                 <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -53,7 +62,7 @@
             </div>
 
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-blue-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200">
+                <button @click="open = ! open" class="inline-flex items-center justify-center rounded-lg p-2 text-slate-500 transition hover:bg-amber-50 hover:text-amber-900">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -71,6 +80,12 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                     {{ __('Products') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
+                    {{ __('Penjualan') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.cashier-accounts.index')" :active="request()->routeIs('admin.cashier-accounts.*')">
+                    {{ __('Akun Kasir') }}
                 </x-responsive-nav-link>
             @endif
             <x-responsive-nav-link :href="route('cashier.index')" :active="request()->routeIs('cashier.*')">

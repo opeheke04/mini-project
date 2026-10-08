@@ -15,13 +15,22 @@ class CashierController extends Controller
 {
     public function index(): View
     {
+        $lowStockThreshold = config('inventory.low_stock_threshold');
         $products = Product::query()
             ->where('is_active', true)
             ->where('stock', '>', 0)
             ->orderBy('name')
             ->get(['id', 'name', 'category', 'price', 'stock']);
 
-        return view('cashier.index', compact('products'));
+        $lowStockProducts = Product::query()
+            ->where('is_active', true)
+            ->where('stock', '<=', $lowStockThreshold)
+            ->orderBy('stock')
+            ->orderBy('name')
+            ->limit(8)
+            ->get(['id', 'name', 'stock']);
+
+        return view('cashier.index', compact('products', 'lowStockProducts', 'lowStockThreshold'));
     }
 
     public function store(Request $request)
@@ -131,9 +140,11 @@ class CashierController extends Controller
         return response()->json([
             'message' => 'Transaksi berhasil disimpan.',
             'transaction' => [
+                'id' => $sale->id,
                 'number' => $sale->transaction_number,
                 'total' => $sale->total,
                 'change' => $sale->change_due,
+                'print_url' => route('cashier.receipt.preview', $sale),
             ],
         ], 201);
     }

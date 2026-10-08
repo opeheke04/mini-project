@@ -5,17 +5,33 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
     /**
      * Menampilkan semua product.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::latest()->paginate(10);
+        $validated = $request->validate([
+            'stock' => ['nullable', Rule::in(['low'])],
+        ]);
 
-        return view('products.index', compact('products'));
+        $lowStockThreshold = config('inventory.low_stock_threshold');
+        $products = Product::query()
+            ->when(($validated['stock'] ?? null) === 'low', fn ($query) => $query->where('stock', '<=', $lowStockThreshold))
+            ->orderByRaw('CASE WHEN stock <= ? THEN 0 ELSE 1 END', [$lowStockThreshold])
+            ->orderBy('stock')
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('products.index', [
+            'products' => $products,
+            'lowStockThreshold' => $lowStockThreshold,
+            'showingLowStock' => ($validated['stock'] ?? null) === 'low',
+        ]);
     }
 
     /**

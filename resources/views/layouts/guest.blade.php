@@ -5,50 +5,78 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-slate-900 antialiased">
-        <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#eef2ff,_#f8fafc_35%,_#e2e8f0_100%)] px-4 py-8 sm:px-6 lg:px-8">
-            <div class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl items-center justify-center">
-                <div class="grid w-full overflow-hidden rounded-[28px] border border-white/60 bg-white/80 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur-sm lg:grid-cols-[1.1fr,1fr]">
-                    <div class="hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-violet-700 p-10 text-white lg:flex lg:flex-col lg:justify-between">
-                        <div>
-                            <div class="mb-8 inline-flex items-center rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-100">
-                                Inventory System
-                            </div>
-                            <h1 class="text-3xl font-black leading-tight">Kelola produk dengan lebih mudah.</h1>
-                            <p class="mt-4 max-w-sm text-base text-blue-100/90">
-                                Akses dashboard, kelola stok, dan pantau produk dengan tampilan yang lebih rapi serta profesional.
+    <body class="login-wallpaper font-sans text-slate-900 antialiased">
+        <main class="relative flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+            <div @class([
+                'grid w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/70 bg-white shadow-[0_32px_100px_rgba(15,23,42,0.3)] lg:min-h-[700px]',
+                'lg:grid-cols-[1.08fr,0.92fr]' => request()->routeIs('login'),
+                'lg:grid-cols-1' => ! request()->routeIs('login'),
+            ])>
+                @if (request()->routeIs('login'))
+                    <section class="login-hero relative flex min-h-[340px] flex-col justify-between overflow-hidden p-7 text-white sm:p-10 lg:min-h-full lg:p-14">
+                        <div class="relative z-10">
+                            <a href="/" class="inline-flex items-center gap-3">
+                                <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/20 bg-white/10 shadow-lg backdrop-blur">
+                                    <x-application-logo class="h-7 w-7 text-amber-300" />
+                                </span>
+                                <span class="text-sm font-bold uppercase tracking-[0.2em] text-white/90">{{ config('app.name') }}</span>
+                            </a>
+
+                            <p class="mt-12 inline-flex items-center gap-2 rounded-full border border-amber-200/25 bg-amber-100/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200 sm:mt-16">
+                                <span class="h-1.5 w-1.5 rounded-full bg-amber-300"></span>
+                                Smart store management
+                            </p>
+                            <h1 class="mt-5 max-w-lg text-3xl font-black leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
+                                Operasional toko, <span class="text-amber-300">lebih terkontrol.</span>
+                            </h1>
+                            <p class="mt-4 max-w-md text-sm leading-7 text-slate-200 sm:text-base">
+                                Satu tempat untuk mengelola produk, memantau stok, dan melayani transaksi dengan lebih praktis.
                             </p>
                         </div>
 
-                        <div class="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
-                            <p class="text-xs uppercase tracking-[0.2em] text-blue-100">Status</p>
-                            <p class="mt-2 text-2xl font-bold">Online</p>
+                        <div class="relative z-10 mt-8 lg:mt-0">
+                            <img
+                                src="{{ asset('images/login-grocery-hero.svg') }}"
+                                alt="Ilustrasi produk kebutuhan toko"
+                                class="mx-auto w-full max-w-[430px] drop-shadow-[0_28px_35px_rgba(0,0,0,0.25)]"
+                            >
+                            <div class="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-white/75">
+                                <span class="inline-flex items-center gap-2"><span class="text-amber-300">✦</span> Stok lebih tertata</span>
+                                <span class="inline-flex items-center gap-2"><span class="text-amber-300">✦</span> Transaksi lebih cepat</span>
+                            </div>
                         </div>
-                    </div>
+                        <div class="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full border border-white/10"></div>
+                        <div class="pointer-events-none absolute -right-12 -top-16 h-56 w-56 rounded-full border border-white/10"></div>
+                    </section>
+                @endif
 
-                    <div class="flex items-center justify-center p-6 sm:p-8 lg:p-10">
-                        <div class="w-full max-w-md">
+                <section class="flex items-center justify-center bg-[#fcfcfb] px-5 py-10 sm:px-10 lg:px-12">
+                    <div class="w-full max-w-md">
+                        @unless (request()->routeIs('login'))
                             <div class="mb-8 flex items-center justify-center">
                                 <a href="/" class="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm">
                                     <x-application-logo class="h-10 w-10 text-blue-600" />
-                                    <span class="text-sm font-bold uppercase tracking-[0.2em] text-slate-600">Profile Prodi</span>
+                                    <span class="text-sm font-bold uppercase tracking-[0.2em] text-slate-600">{{ config('app.name') }}</span>
                                 </a>
                             </div>
+                        @endunless
 
-                            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-                                {{ $slot }}
-                            </div>
+                        <div @class([
+                            'rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_18px_55px_rgba(15,23,42,0.07)] sm:p-8',
+                            'login-form-card' => request()->routeIs('login'),
+                        ])>
+                            {{ $slot }}
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
-        </div>
+        </main>
     </body>
 </html>

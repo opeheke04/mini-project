@@ -2,8 +2,9 @@
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <div class="mb-6">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Welcome back</p>
-        <h2 class="mt-2 text-2xl font-black text-slate-800">Masuk ke akun Anda</h2>
+        <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-amber-700">Portal akses</p>
+        <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900">Selamat datang kembali</h2>
+        <p class="mt-2 text-sm leading-6 text-slate-500">Masuk untuk melanjutkan pengelolaan toko Anda.</p>
     </div>
 
     <form method="POST" action="{{ route('login') }}" class="space-y-5">
@@ -43,9 +44,5 @@
             </x-primary-button>
         </div>
 
-        <div class="pt-2 text-center text-sm text-slate-600">
-            Belum punya akun?
-            <a href="{{ route('register') }}" class="font-semibold text-blue-600 hover:text-blue-500">Daftar sekarang</a>
-        </div>
     </form>
 </x-guest-layout>

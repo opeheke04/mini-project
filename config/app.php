@@ -13,7 +13,19 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Minimarket POS'),
+    'initial_users' => [
+        'admin' => [
+            'name' => env('INITIAL_ADMIN_NAME', 'Administrator'),
+            'email' => env('INITIAL_ADMIN_EMAIL'),
+            'password' => env('INITIAL_ADMIN_PASSWORD'),
+        ],
+        'cashier' => [
+            'name' => env('INITIAL_CASHIER_NAME', 'Kasir'),
+            'email' => env('INITIAL_CASHIER_EMAIL'),
+            'password' => env('INITIAL_CASHIER_PASSWORD'),
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
