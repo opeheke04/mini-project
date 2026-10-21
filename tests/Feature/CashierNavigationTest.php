@@ -19,6 +19,7 @@ class CashierNavigationTest extends TestCase
             'price' => 3500,
             'stock' => 10,
             'is_active' => true,
+            'image' => 'products/indomie.webp',
         ]);
 
         $response = $this
@@ -29,6 +30,8 @@ class CashierNavigationTest extends TestCase
             ->assertOk()
             ->assertSeeText('Transaksi Kasir')
             ->assertSeeText('Indomie Goreng')
+            ->assertSeeText('Pilih Produk')
+            ->assertSee('indomie.webp', false)
             ->assertSeeText('Bayar');
     }
 

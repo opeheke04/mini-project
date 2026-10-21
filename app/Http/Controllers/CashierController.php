@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Support\StoreProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -20,7 +21,13 @@ class CashierController extends Controller
             ->where('is_active', true)
             ->where('stock', '>', 0)
             ->orderBy('name')
-            ->get(['id', 'name', 'category', 'price', 'stock']);
+            ->get(['id', 'name', 'category', 'price', 'stock', 'image'])
+            ->each(function (Product $product): void {
+                $product->setAttribute(
+                    'image_url',
+                    $product->image ? asset('storage/'.$product->image) : null
+                );
+            });
 
         $lowStockProducts = Product::query()
             ->where('is_active', true)
@@ -30,7 +37,13 @@ class CashierController extends Controller
             ->limit(8)
             ->get(['id', 'name', 'stock']);
 
-        return view('cashier.index', compact('products', 'lowStockProducts', 'lowStockThreshold'));
+        return view('cashier.index', [
+            'products' => $products,
+            'lowStockProducts' => $lowStockProducts,
+            'lowStockThreshold' => $lowStockThreshold,
+            'storeName' => StoreProfile::get('store_name', 'POLIJE MART'),
+            'storeLogo' => StoreProfile::get('logo'),
+        ]);
     }
 
     public function store(Request $request)

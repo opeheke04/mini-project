@@ -2,8 +2,15 @@
     <x-slot name="header">
         <div class="cashier-header flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <p class="soft-label">Minimarket POS</p>
-                <h2 class="mt-3 text-3xl font-black tracking-tight text-slate-950">Transaksi Kasir</h2>
+                <div class="flex items-center gap-3">
+                    @if ($storeLogo !== '')
+                        <img src="{{ asset('storage/'.$storeLogo) }}" alt="" class="h-12 w-12 rounded-2xl border border-slate-200 bg-white object-contain p-1 shadow-sm">
+                    @endif
+                    <div>
+                        <p class="soft-label">{{ $storeName }}</p>
+                        <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">Transaksi Kasir</h2>
+                    </div>
+                </div>
                 <p class="mt-1 text-sm text-slate-500">Cari barang, susun keranjang, dan selesaikan pembayaran.</p>
             </div>
             <div class="transaction-ticket text-left sm:text-right">
@@ -78,6 +85,17 @@
                     </div>
                 </div>
 
+                <section class="panel-surface overflow-hidden" aria-label="Pilih produk cepat">
+                    <div class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h3 class="font-black text-slate-900">Pilih Produk</h3>
+                            <p class="mt-1 text-xs text-slate-500">Tekan kartu produk untuk langsung memasukkan ke keranjang.</p>
+                        </div>
+                        <span id="productGridCount" class="w-fit rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-900">{{ $products->count() }} produk tersedia</span>
+                    </div>
+                    <div id="productGrid" class="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 sm:p-5 lg:grid-cols-4"></div>
+                </section>
+
                 <div class="panel-surface cart-panel overflow-hidden">
                     <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                         <div class="flex items-start gap-3">
@@ -121,9 +139,9 @@
                         <label class="summary-row" for="tax"><span>Pajak / PPN</span><input id="tax" type="number" min="0" value="0" class="summary-input"></label>
                         <label class="summary-row" for="otherFee"><span>Biaya Lain</span><input id="otherFee" type="number" min="0" value="0" class="summary-input"></label>
 
-                        <div class="rounded-2xl bg-slate-900 p-5 text-white">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Total Akhir</p>
-                            <p id="grandTotal" class="mt-2 text-3xl font-black">Rp 0</p>
+                        <div class="rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-5 text-white shadow-lg shadow-slate-900/15 ring-1 ring-white/10 sm:p-6">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-amber-300">Total Akhir</p>
+                            <p id="grandTotal" class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Rp 0</p>
                         </div>
                     </div>
                 </div>
@@ -137,7 +155,7 @@
                         <div>
                             <div class="mb-2 flex items-center justify-between">
                                 <label for="payment" class="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Uang Dibayar</label>
-                                <span class="rounded-lg bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700">F4 Bayar</span>
+                                <span class="rounded-lg bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-800">F4 Bayar</span>
                             </div>
                             <div class="payment-field">
                                 <span>Rp</span>
@@ -180,7 +198,7 @@
                                 <button type="button" id="deleteHeldButton" class="btn-danger shrink-0 px-3" disabled aria-label="Hapus transaksi ditahan">Hapus</button>
                             </div>
                         </section>
-                        <button type="button" id="payButton" class="btn-success w-full">Bayar & Cetak</button>
+                        <button type="button" id="payButton" class="btn-success min-h-14 w-full text-base">Bayar & Cetak</button>
                     </div>
                 </div>
             </aside>

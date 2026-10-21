@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Sale;
+use App\Support\StoreProfile;
 use Illuminate\Support\Facades\Log;
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
@@ -11,7 +12,7 @@ class ReceiptPrinter
 {
     public function printSale(Sale $sale): bool
     {
-        if (! config('printer.enabled', false)) {
+        if (! $this->isEnabled()) {
             Log::info('Receipt printing skipped because printer is disabled.', [
                 'sale_id' => $sale->id,
                 'transaction_number' => $sale->transaction_number,
@@ -30,10 +31,10 @@ class ReceiptPrinter
             Log::error('Receipt printer failed to print transaction.', [
                 'sale_id' => $sale->id,
                 'transaction_number' => $sale->transaction_number,
-                'driver' => config('printer.driver'),
-                'printer_name' => config('printer.name'),
-                'printer_host' => config('printer.host'),
-                'printer_port' => config('printer.port'),
+                'driver' => $this->driver(),
+                'printer_name' => $this->printerName(),
+                'printer_host' => $this->printerHost(),
+                'printer_port' => $this->printerPort(),
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -42,16 +43,61 @@ class ReceiptPrinter
         }
     }
 
+    public function testPrint(): bool
+    {
+        $sale = new Sale([
+            'transaction_number' => 'TEST-PRINT',
+            'customer_type' => 'Umum',
+            'total' => '0.00',
+            'amount_paid' => '0.00',
+            'change_due' => '0.00',
+            'created_at' => now(),
+        ]);
+        $sale->setRelation('user', (object) ['name' => auth()->user()?->name ?? 'Admin']);
+        $sale->setRelation('items', collect([
+            (object) [
+                'product_name' => 'Tes Cetak Struk',
+                'quantity' => 1,
+                'unit_price' => '0.00',
+                'line_total' => '0.00',
+            ],
+        ]));
+
+        return $this->printSale($sale);
+    }
+
+    protected function isEnabled(): bool
+    {
+        return filter_var(StoreProfile::get('printer.enabled', 'false'), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    protected function driver(): string
+    {
+        return StoreProfile::get('printer.driver', 'windows');
+    }
+
+    protected function printerName(): string
+    {
+        return StoreProfile::get('printer.name', 'POS-58');
+    }
+
+    protected function printerHost(): string
+    {
+        return StoreProfile::get('printer.host', '192.168.1.100');
+    }
+
+    protected function printerPort(): int
+    {
+        return (int) StoreProfile::get('printer.port', '9100');
+    }
+
     protected function makeConnector()
     {
-        if (config('printer.driver') === 'network') {
-            return new NetworkPrintConnector(
-                config('printer.host', '192.168.1.100'),
-                (int) config('printer.port', 9100)
-            );
+        if ($this->driver() === 'network') {
+            return new NetworkPrintConnector($this->printerHost(), $this->printerPort());
         }
 
-        return new SharedWindowsPrintConnector(config('printer.name', 'POS-58'));
+        return new SharedWindowsPrintConnector($this->printerName());
     }
 
     protected function writeReceipt(Printer $printer, Sale $sale): void
@@ -61,10 +107,10 @@ class ReceiptPrinter
 
         $printer->setJustification(Printer::JUSTIFY_CENTER);
         $printer->setEmphasis(true);
-        $printer->text($this->centerText(config('printer.store_name', 'POLIJE MART')) . "\n");
+        $printer->text($this->centerText(StoreProfile::get('store_name', 'POLIJE MART')) . "\n");
         $printer->setEmphasis(false);
-        $printer->text($this->centerText(config('printer.address', 'Jl. Mastrip No. 164, Jember')) . "\n");
-        $printer->text($this->centerText('Telp. ' . config('printer.phone', '0812-3456-7890')) . "\n");
+        $printer->text($this->centerText(StoreProfile::get('address', 'Jl. Mastrip No. 164, Jember')) . "\n");
+        $printer->text($this->centerText('Telp. ' . StoreProfile::get('phone', '0812-3456-7890')) . "\n");
         $printer->text($separator);
 
         $printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -89,7 +135,7 @@ class ReceiptPrinter
         $printer->text($separator);
 
         $printer->setJustification(Printer::JUSTIFY_CENTER);
-        $printer->text($this->centerText(config('printer.footer', 'Terima Kasih Atas Kunjungan Anda')) . "\n");
+        $printer->text($this->centerText(StoreProfile::get('footer', 'Terima Kasih Atas Kunjungan Anda')) . "\n");
         $printer->text($this->centerText('Selamat Berbelanja Kembali') . "\n");
         $printer->feed(3);
         $printer->cut();

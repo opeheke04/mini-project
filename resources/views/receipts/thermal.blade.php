@@ -79,9 +79,12 @@
 </head>
 <body>
     <header class="center">
-        <div class="store-name">{{ config('printer.store_name', 'POLIJE MART') }}</div>
-        <div>{{ config('printer.address', 'Jl. Mastrip No. 164, Jember') }}</div>
-        <div>Telp. {{ config('printer.phone', '0812-3456-7890') }}</div>
+        @if (\App\Support\StoreProfile::get('logo') !== '')
+            <img src="{{ asset('storage/'.\App\Support\StoreProfile::get('logo')) }}" alt="" style="display:block;width:22mm;height:22mm;object-fit:contain;margin:0 auto 3mm;">
+        @endif
+        <div class="store-name">{{ \App\Support\StoreProfile::get('store_name', 'POLIJE MART') }}</div>
+        <div>{{ \App\Support\StoreProfile::get('address', 'Jl. Mastrip No. 164, Jember') }}</div>
+        <div>Telp. {{ \App\Support\StoreProfile::get('phone', '0812-3456-7890') }}</div>
     </header>
 
     <hr class="separator">
@@ -118,7 +121,7 @@
 
     <hr class="separator">
     <div class="center">
-        <div>{{ config('printer.footer', 'Terima Kasih Atas Kunjungan Anda') }}</div>
+        <div>{{ \App\Support\StoreProfile::get('footer', 'Terima Kasih Atas Kunjungan Anda') }}</div>
         <div>Selamat Berbelanja Kembali</div>
     </div>
 

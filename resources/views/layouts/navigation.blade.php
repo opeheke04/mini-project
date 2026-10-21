@@ -4,10 +4,14 @@
             <div class="flex">
                 <div class="flex shrink-0 items-center">
                     <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-3">
-                        <span class="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 p-2.5 text-amber-300 shadow-[0_10px_25px_rgba(15,23,42,0.25)]">
-                            <x-application-logo class="block h-7 w-7" />
-                        </span>
-                        <span class="hidden text-sm font-black uppercase tracking-[0.14em] text-slate-800 sm:block">{{ config('app.name') }}</span>
+                        @if (\App\Support\StoreProfile::get('logo') !== '')
+                            <img src="{{ asset('storage/'.\App\Support\StoreProfile::get('logo')) }}" alt="" class="h-10 w-10 rounded-xl border border-slate-200 bg-white object-contain p-1">
+                        @else
+                            <span class="inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 p-2.5 text-amber-300 shadow-[0_10px_25px_rgba(15,23,42,0.25)]">
+                                <x-application-logo class="block h-7 w-7" />
+                            </span>
+                        @endif
+                        <span class="max-w-[11rem] truncate text-xs font-black uppercase tracking-[0.12em] text-slate-800 sm:max-w-[15rem] sm:text-sm">{{ \App\Support\StoreProfile::get('store_name', config('app.name')) }}</span>
                     </a>
                 </div>
 
@@ -24,6 +28,9 @@
                         </x-nav-link>
                         <x-nav-link :href="route('admin.cashier-accounts.index')" :active="request()->routeIs('admin.cashier-accounts.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-700">
                             {{ __('Akun Kasir') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.store-settings.index')" :active="request()->routeIs('admin.store-settings.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-700">
+                            {{ __('Profil Toko') }}
                         </x-nav-link>
                     @endif
                     <x-nav-link :href="route('cashier.index')" :active="request()->routeIs('cashier.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-800">
@@ -47,14 +54,19 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            {{ __('Profil akun') }}
                         </x-dropdown-link>
+                        @if (Auth::user()->role === 'admin')
+                            <x-dropdown-link :href="route('admin.store-settings.index')">
+                                {{ __('Profil Toko') }}
+                            </x-dropdown-link>
+                        @endif
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                {{ __('Keluar') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -79,13 +91,16 @@
                     {{ __('Dashboard') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
-                    {{ __('Products') }}
+                    {{ __('Produk') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
                     {{ __('Penjualan') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.cashier-accounts.index')" :active="request()->routeIs('admin.cashier-accounts.*')">
                     {{ __('Akun Kasir') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.store-settings.index')" :active="request()->routeIs('admin.store-settings.*')">
+                    {{ __('Profil Toko') }}
                 </x-responsive-nav-link>
             @endif
             <x-responsive-nav-link :href="route('cashier.index')" :active="request()->routeIs('cashier.*')">
@@ -101,14 +116,19 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    {{ __('Profil akun') }}
                 </x-responsive-nav-link>
+                @if (Auth::user()->role === 'admin')
+                    <x-responsive-nav-link :href="route('admin.store-settings.index')">
+                        {{ __('Profil Toko') }}
+                    </x-responsive-nav-link>
+                @endif
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        {{ __('Keluar') }}
                     </x-responsive-nav-link>
                 </form>
             </div>

@@ -12,13 +12,13 @@
 
         <div>
             <x-input-label for="email" :value="__('Email')" class="!text-sm !font-semibold !text-slate-700" />
-            <x-text-input id="email" class="mt-1 block w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-slate-800 shadow-sm transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+            <x-text-input id="email" class="mt-1 block w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-slate-800 shadow-sm transition focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-200" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <div>
-            <x-input-label for="password" :value="__('Password')" class="!text-sm !font-semibold !text-slate-700" />
-            <x-text-input id="password" class="mt-1 block w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-slate-800 shadow-sm transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200"
+            <x-input-label for="password" value="Kata sandi" class="!text-sm !font-semibold !text-slate-700" />
+            <x-text-input id="password" class="mt-1 block w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-slate-800 shadow-sm transition focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-200"
                 type="password"
                 name="password"
                 required autocomplete="current-password" />
@@ -27,20 +27,20 @@
 
         <div class="flex items-center justify-between gap-3">
             <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-blue-600 shadow-sm focus:ring-blue-500" name="remember">
-                <span class="ml-2 text-sm text-slate-600">{{ __('Remember me') }}</span>
+                <input id="remember_me" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-amber-600 shadow-sm focus:ring-amber-500" name="remember">
+                <span class="ml-2 text-sm text-slate-600">Ingat saya</span>
             </label>
 
             @if (Route::has('password.request'))
-                <a class="text-sm font-medium text-blue-600 transition hover:text-blue-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
+                <a class="text-sm font-medium text-amber-800 transition hover:text-amber-950" href="{{ route('password.request') }}">
+                    Lupa kata sandi?
                 </a>
             @endif
         </div>
 
         <div class="pt-2">
             <x-primary-button class="w-full justify-center px-5 py-3 text-sm font-bold uppercase tracking-[0.12em]">
-                {{ __('Log in') }}
+                Masuk
             </x-primary-button>
         </div>
 

@@ -76,6 +76,93 @@
             </article>
         </section>
 
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Ringkasan penjualan">
+            <article class="stat-card">
+                <p class="stat-label">Omzet hari ini</p>
+                <p class="stat-value text-amber-800">Rp {{ number_format((float) $todaySummary->revenue, 0, ',', '.') }}</p>
+                <p class="stat-footnote">{{ number_format((int) $todaySummary->transaction_count) }} transaksi hari ini</p>
+            </article>
+            <article class="stat-card">
+                <p class="stat-label">Omzet bulan ini</p>
+                <p class="stat-value text-emerald-700">Rp {{ number_format((float) $monthSummary->revenue, 0, ',', '.') }}</p>
+                <p class="stat-footnote">{{ number_format((int) $monthSummary->transaction_count) }} transaksi bulan ini</p>
+            </article>
+            <article class="stat-card flex flex-col justify-between">
+                <div>
+                    <p class="stat-label">Laporan lengkap</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-500">Lihat transaksi dengan filter tanggal, kasir, dan metode pembayaran.</p>
+                </div>
+                <a href="{{ route('sales.index') }}" class="mt-4 inline-flex w-fit items-center gap-2 text-sm font-black text-amber-800 hover:text-amber-950">
+                    Buka riwayat penjualan <span aria-hidden="true">→</span>
+                </a>
+            </article>
+        </section>
+
+        <section class="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.8fr)]">
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_12px_35px_rgba(15,23,42,0.05)] sm:p-6">
+                <div class="mb-5">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <h3 class="font-black text-slate-900">Omzet 7 hari terakhir</h3>
+                            <p class="mt-1 text-xs text-slate-500">Dibandingkan dengan 7 hari sebelumnya</p>
+                        </div>
+                        <div class="rounded-xl bg-slate-50 px-3 py-2 sm:text-right">
+                            <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Perubahan omzet</p>
+                            <p class="mt-1 text-sm font-black {{ $weeklyChangePercent === null ? 'text-slate-700' : ($weeklyChangePercent >= 0 ? 'text-emerald-700' : 'text-rose-700') }}">
+                                @if ($weeklyChangePercent === null)
+                                    {{ $currentWeekRevenue > 0 ? 'Ada penjualan baru' : 'Belum ada data pembanding' }}
+                                @else
+                                    {{ $weeklyChangePercent >= 0 ? '+' : '' }}{{ number_format($weeklyChangePercent, 1, ',', '.') }}%
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-4 text-[11px] font-semibold text-slate-500">
+                        <span class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-sm bg-amber-500"></span>Minggu ini · Rp {{ number_format($currentWeekRevenue, 0, ',', '.') }}</span>
+                        <span class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-sm bg-slate-300"></span>Minggu lalu · Rp {{ number_format($previousWeekRevenue, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+                @php($maxDailyRevenue = max(1, (float) max($salesTrend->max('revenue'), $salesTrend->max('previous_revenue'))))
+                <div class="grid h-48 grid-cols-7 items-end gap-2 sm:gap-4" aria-label="Grafik perbandingan omzet harian">
+                    @foreach ($salesTrend as $day)
+                        <div class="flex h-full min-w-0 flex-col items-center justify-end gap-2">
+                            <span class="max-w-full truncate text-center text-[9px] font-semibold text-slate-500" title="Minggu ini: Rp {{ number_format($day['revenue'], 0, ',', '.') }}">
+                                {{ $day['revenue'] > 0 ? number_format($day['revenue'] / 1000, 1, ',', '.').'k' : '0' }}
+                            </span>
+                            <div class="flex w-full items-end justify-center gap-1" title="{{ $day['date']->locale('id')->translatedFormat('d F') }}: minggu ini Rp {{ number_format($day['revenue'], 0, ',', '.') }}, minggu lalu Rp {{ number_format($day['previous_revenue'], 0, ',', '.') }}">
+                                <div class="flex h-32 w-1/2 max-w-8 items-end rounded-t-md bg-slate-100">
+                                    <div class="w-full rounded-t-md bg-slate-300" style="height: {{ $day['previous_revenue'] > 0 ? max(6, ($day['previous_revenue'] / $maxDailyRevenue) * 100) : 3 }}%"></div>
+                                </div>
+                                <div class="flex h-32 w-1/2 max-w-8 items-end rounded-t-md bg-amber-50">
+                                    <div class="w-full rounded-t-md bg-gradient-to-t from-amber-500 to-amber-300" style="height: {{ $day['revenue'] > 0 ? max(6, ($day['revenue'] / $maxDailyRevenue) * 100) : 3 }}%"></div>
+                                </div>
+                            </div>
+                            <span class="text-center text-[10px] font-bold leading-tight text-slate-500">{{ $day['date']->locale('id')->translatedFormat('D') }}<br>{{ $day['date']->format('d/m') }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </article>
+
+            <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.05)]">
+                <div class="border-b border-slate-100 px-5 py-4 sm:px-6">
+                    <h3 class="font-black text-slate-900">Produk terlaris bulan ini</h3>
+                    <p class="mt-1 text-xs text-slate-500">Diurutkan berdasarkan unit terjual</p>
+                </div>
+                @forelse ($topProducts as $index => $product)
+                    <div class="flex items-center gap-3 border-b border-slate-100 px-5 py-3 last:border-0 sm:px-6">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-xs font-black text-amber-800">{{ $index + 1 }}</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-bold text-slate-800">{{ $product->product_name }}</p>
+                            <p class="text-xs text-slate-500">{{ number_format((int) $product->units_sold) }} unit terjual</p>
+                        </div>
+                        <span class="whitespace-nowrap text-xs font-bold text-slate-700">Rp {{ number_format((float) $product->revenue, 0, ',', '.') }}</span>
+                    </div>
+                @empty
+                    <p class="px-5 py-8 text-center text-sm text-slate-500">Belum ada penjualan bulan ini.</p>
+                @endforelse
+            </article>
+        </section>
+
         <section class="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.8fr)]">
             <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.05)]">
                 <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
@@ -146,6 +233,45 @@
                     <div class="min-w-0"><p class="truncate text-xs font-bold text-slate-800">{{ Auth::user()->name }}</p><p class="text-[10px] uppercase tracking-wide text-slate-500">Administrator</p></div>
                     <span class="ml-auto flex h-2 w-2 rounded-full bg-emerald-500"></span>
                 </div>
+            </div>
+        </section>
+
+        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.05)]">
+            <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                <div>
+                    <h3 class="font-black text-slate-900">Transaksi terbaru</h3>
+                    <p class="mt-1 text-xs text-slate-500">Lima transaksi terakhir dari semua kasir</p>
+                </div>
+                <a href="{{ route('sales.index') }}" class="shrink-0 text-xs font-bold text-amber-800 hover:text-amber-950">Semua transaksi →</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                        <tr>
+                            <th class="px-5 py-3">Waktu / Nomor</th>
+                            <th class="px-5 py-3">Kasir</th>
+                            <th class="px-5 py-3">Pembayaran</th>
+                            <th class="px-5 py-3 text-right">Total</th>
+                            <th class="px-5 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse ($recentSales as $sale)
+                            <tr>
+                                <td class="whitespace-nowrap px-5 py-3">
+                                    <span class="block font-mono text-xs font-bold text-slate-800">{{ $sale->transaction_number }}</span>
+                                    <span class="mt-1 block text-xs text-slate-500">{{ $sale->created_at->format('d/m/Y H:i') }}</span>
+                                </td>
+                                <td class="whitespace-nowrap px-5 py-3 text-slate-700">{{ $sale->user?->name ?? 'Akun dihapus' }}</td>
+                                <td class="whitespace-nowrap px-5 py-3 text-slate-700">{{ $sale->payment_method }}</td>
+                                <td class="whitespace-nowrap px-5 py-3 text-right font-bold text-slate-900">Rp {{ number_format((float) $sale->total, 0, ',', '.') }}</td>
+                                <td class="whitespace-nowrap px-5 py-3 text-right"><a href="{{ route('sales.show', $sale) }}" class="font-bold text-amber-800 underline">Detail</a></td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5" class="px-5 py-8 text-center text-slate-500">Belum ada transaksi penjualan.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </section>
     </div>

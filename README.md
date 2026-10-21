@@ -7,7 +7,7 @@ A Laravel point-of-sale and inventory application for a small minimarket. It inc
 - PHP 8.2 or newer with the extensions required by Laravel
 - Composer
 - Node.js and npm
-- MySQL/MariaDB (or another Laravel-supported database)
+- A Laravel-supported database. The default local setup uses SQLite and does not require a separate database server.
 
 ## Local setup
 
@@ -20,7 +20,13 @@ php artisan key:generate
 npm install
 ```
 
-Configure the database connection in `.env`. For the default XAMPP MySQL setup, set `DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE` to an existing database, and your local MySQL username/password.
+The default `.env.example` uses SQLite, file-based sessions/cache, and a synchronous local queue, so the app can run without starting MySQL. Ensure `database\database.sqlite` exists (the repository includes it); if it does not, create an empty file before migrating:
+
+```powershell
+New-Item -ItemType File database\database.sqlite
+```
+
+To use XAMPP MySQL instead, start MySQL in the XAMPP Control Panel, create a database, then set `DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE` to that database, and your local MySQL username/password in `.env`.
 
 Before creating initial user accounts, set these values in `.env`:
 

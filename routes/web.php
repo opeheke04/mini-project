@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CashierAccountController;
@@ -18,34 +19,7 @@ Route::get('/dashboard', function () {
         : redirect()->route('cashier.index');
 })->middleware('auth')->name('dashboard');
 
-Route::get('/admin/dashboard', function () {
-    $totalProducts = \App\Models\Product::count();
-    $activeProducts = \App\Models\Product::where('is_active', true)->count();
-    $inactiveProducts = \App\Models\Product::where('is_active', false)->count();
-    $stockProducts = \App\Models\Product::sum('stock');
-    $lowStockThreshold = config('inventory.low_stock_threshold');
-    $lowStockCount = \App\Models\Product::query()
-        ->where('is_active', true)
-        ->where('stock', '<=', $lowStockThreshold)
-        ->count();
-    $lowStockProducts = \App\Models\Product::query()
-        ->where('is_active', true)
-        ->where('stock', '<=', $lowStockThreshold)
-        ->orderBy('stock')
-        ->orderBy('name')
-        ->limit(6)
-        ->get(['id', 'name', 'stock']);
-
-    return view('dashboard', compact(
-        'totalProducts',
-        'activeProducts',
-        'inactiveProducts',
-        'stockProducts',
-        'lowStockThreshold',
-        'lowStockCount',
-        'lowStockProducts'
-    ));
-})->middleware('admin')->name('admin.dashboard');
+Route::get('/admin/dashboard', AdminDashboardController::class)->middleware('admin')->name('admin.dashboard');
 
 Route::get('/admin', function () {
     return "Selamat datang di halaman admin!";
@@ -68,6 +42,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('products', ProductController::class);
     Route::get('/admin/cashier-accounts', [CashierAccountController::class, 'index'])->name('admin.cashier-accounts.index');
     Route::post('/admin/cashier-accounts', [CashierAccountController::class, 'store'])->name('admin.cashier-accounts.store');
+    Route::get('/admin/store-settings', [\App\Http\Controllers\StoreSettingsController::class, 'index'])->name('admin.store-settings.index');
+    Route::post('/admin/store-settings', [\App\Http\Controllers\StoreSettingsController::class, 'update'])->name('admin.store-settings.update');
+    Route::post('/admin/store-settings/test-print', [\App\Http\Controllers\StoreSettingsController::class, 'testPrint'])->name('admin.store-settings.test-print');
     Route::get('/sales', [SalesReportController::class, 'index'])->name('sales.index');
     Route::get('/sales/{sale}', [SalesReportController::class, 'show'])->name('sales.show');
 });

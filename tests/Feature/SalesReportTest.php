@@ -73,6 +73,31 @@ class SalesReportTest extends TestCase
             ->assertSeeText('081234567890');
     }
 
+    public function test_admin_can_filter_reports_by_cashier_and_payment_method(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $cashier = User::factory()->create(['role' => 'kasir', 'name' => 'Kasir Filter']);
+        $matching = $this->createSale('TRX-FILTER-001', '12000.00', now()->toDateTimeString(), [
+            'user_id' => $cashier->id,
+            'payment_method' => 'QRIS',
+        ]);
+        $this->createSale('TRX-FILTER-002', '8000.00', now()->toDateTimeString(), [
+            'payment_method' => 'Tunai',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('sales.index', [
+                'from' => now()->toDateString(),
+                'to' => now()->toDateString(),
+                'cashier_id' => $cashier->id,
+                'payment_method' => 'QRIS',
+            ]))
+            ->assertOk()
+            ->assertSeeText($matching->transaction_number)
+            ->assertDontSeeText('TRX-FILTER-002')
+            ->assertSeeText('12.000');
+    }
+
     public function test_guests_and_cashiers_cannot_view_sales_reports(): void
     {
         $sale = $this->createSale('TRX-RESTRICTED-001', '1000.00', now()->toDateTimeString());

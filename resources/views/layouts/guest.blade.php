@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="id">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name') }}</title>
+        <title>{{ \App\Support\StoreProfile::get('store_name', config('app.name')) }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -23,15 +23,19 @@
                     <section class="login-hero relative flex min-h-[340px] flex-col justify-between overflow-hidden p-7 text-white sm:p-10 lg:min-h-full lg:p-14">
                         <div class="relative z-10">
                             <a href="/" class="inline-flex items-center gap-3">
-                                <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/20 bg-white/10 shadow-lg backdrop-blur">
-                                    <x-application-logo class="h-7 w-7 text-amber-300" />
-                                </span>
-                                <span class="text-sm font-bold uppercase tracking-[0.2em] text-white/90">{{ config('app.name') }}</span>
+                                @if (\App\Support\StoreProfile::get('logo') !== '')
+                                    <img src="{{ asset('storage/'.\App\Support\StoreProfile::get('logo')) }}" alt="" class="h-11 w-11 rounded-2xl border border-white/20 bg-white object-contain p-1">
+                                @else
+                                    <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/20 bg-white/10 shadow-lg backdrop-blur">
+                                        <x-application-logo class="h-7 w-7 text-amber-300" />
+                                    </span>
+                                @endif
+                                <span class="text-sm font-bold uppercase tracking-[0.14em] text-white/90">{{ \App\Support\StoreProfile::get('store_name', config('app.name')) }}</span>
                             </a>
 
                             <p class="mt-12 inline-flex items-center gap-2 rounded-full border border-amber-200/25 bg-amber-100/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200 sm:mt-16">
                                 <span class="h-1.5 w-1.5 rounded-full bg-amber-300"></span>
-                                Smart store management
+                                Pengelolaan toko yang cerdas
                             </p>
                             <h1 class="mt-5 max-w-lg text-3xl font-black leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem]">
                                 Operasional toko, <span class="text-amber-300">lebih terkontrol.</span>
@@ -62,8 +66,12 @@
                         @unless (request()->routeIs('login'))
                             <div class="mb-8 flex items-center justify-center">
                                 <a href="/" class="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm">
-                                    <x-application-logo class="h-10 w-10 text-blue-600" />
-                                    <span class="text-sm font-bold uppercase tracking-[0.2em] text-slate-600">{{ config('app.name') }}</span>
+                                    @if (\App\Support\StoreProfile::get('logo') !== '')
+                                        <img src="{{ asset('storage/'.\App\Support\StoreProfile::get('logo')) }}" alt="" class="h-10 w-10 rounded-lg object-contain">
+                                    @else
+                                        <x-application-logo class="h-10 w-10 text-amber-700" />
+                                    @endif
+                                    <span class="text-sm font-bold uppercase tracking-[0.14em] text-slate-600">{{ \App\Support\StoreProfile::get('store_name', config('app.name')) }}</span>
                                 </a>
                             </div>
                         @endunless

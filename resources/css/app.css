@@ -10,6 +10,14 @@ html {
     scroll-behavior: smooth;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    @apply outline-none ring-4 ring-amber-200;
+}
+
 body {
     @apply bg-slate-100 text-slate-800 antialiased;
     background-image: radial-gradient(circle at 8% 0%, rgba(245, 158, 11, 0.06), transparent 24%), linear-gradient(145deg, #f8fafc 0%, #f3f5f8 52%, #edf0f4 100%);
@@ -191,7 +199,7 @@ body {
 }
 
 .hero-ring {
-    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.4), 0 25px 80px rgba(37, 99, 235, 0.15);
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.4), 0 25px 80px rgba(217, 119, 6, 0.1);
 }
 
 .cashier-page {
@@ -205,7 +213,7 @@ body {
     height: 18rem;
     z-index: 0;
     pointer-events: none;
-    background: radial-gradient(circle at 76% 18%, rgba(99, 102, 241, 0.12), transparent 42%), radial-gradient(circle at 12% 0%, rgba(14, 165, 233, 0.1), transparent 38%);
+    background: radial-gradient(circle at 76% 18%, rgba(245, 158, 11, 0.12), transparent 42%), radial-gradient(circle at 12% 0%, rgba(148, 163, 184, 0.12), transparent 38%);
 }
 
 .cashier-page > * {
@@ -267,7 +275,7 @@ body {
 }
 
 .payment-method {
-    @apply rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:text-amber-900 hover:shadow-md;
+    @apply min-h-11 rounded-xl border border-slate-200 bg-white px-2 py-2.5 text-xs font-bold text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:text-amber-900 hover:shadow-md;
 }
 
 .payment-method.active {
@@ -279,11 +287,27 @@ body {
 }
 
 .product-result {
-    @apply flex w-full items-center justify-between gap-4 rounded-lg px-3 py-3 text-left text-sm transition hover:bg-blue-50;
+    @apply flex w-full items-center justify-between gap-4 rounded-xl px-3 py-3 text-left text-sm transition hover:bg-amber-50;
 }
 
 .product-result small {
     @apply mt-1 block text-xs font-normal text-slate-400;
+}
+
+.product-tile {
+    @apply relative min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-amber-200;
+}
+
+.product-tile-image {
+    @apply block h-28 w-full bg-slate-100 object-cover sm:h-32;
+}
+
+.product-tile-add {
+    @apply absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-amber-400 text-lg font-bold text-slate-950 shadow-md;
+}
+
+.product-placeholder {
+    background: linear-gradient(135deg, #f1f5f9, #fffbeb);
 }
 
 .qty-control {
@@ -316,6 +340,23 @@ body {
 
 .empty-cart span {
     @apply text-xs text-slate-300;
+}
+
+@media (max-width: 639px) {
+    #paymentMethods {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 #changeBox.short-payment {

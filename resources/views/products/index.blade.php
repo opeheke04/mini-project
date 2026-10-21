@@ -18,11 +18,6 @@
 
     <div class="py-12">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            @if (session('success'))
-                <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 shadow-sm">
-                    {{ session('success') }}
-                </div>
-            @endif
             @if ($showingLowStock)
                 <div class="mb-6 flex flex-col gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between">
                     <span>{{ __('Menampilkan produk dengan stok :count unit atau kurang.', ['count' => $lowStockThreshold]) }}</span>
@@ -46,7 +41,7 @@
                                 <th class="px-4 py-3">Harga</th>
                                 <th class="px-4 py-3">Stok</th>
                                 <th class="px-4 py-3">Status</th>
-                                <th class="px-4 py-3">Gambar</th>
+                                <th class="px-4 py-3">Foto</th>
                                 <th class="px-4 py-3 text-right">Aksi</th>
                             </tr>
                         </thead>
@@ -80,9 +75,9 @@
                                     </td>
                                     <td class="px-4 py-4">
                                         @if ($product->image)
-                                            <img class="h-16 w-16 rounded-lg object-cover shadow-sm ring-1 ring-slate-200" src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
+                                            <img class="h-20 w-20 rounded-xl object-cover shadow-sm ring-1 ring-slate-200" src="{{ asset('storage/' . $product->image) }}" alt="Foto {{ $product->name }}" loading="lazy">
                                         @else
-                                            <span class="inline-flex h-16 w-16 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold text-slate-400">Tanpa gambar</span>
+                                            <span class="product-placeholder inline-flex h-20 w-20 items-center justify-center rounded-xl text-xs font-bold text-slate-500">Tanpa foto</span>
                                         @endif
                                     </td>
                                     <td class="rounded-r-xl px-4 py-4">

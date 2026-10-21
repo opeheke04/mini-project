@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="id">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name') }}</title>
+        <title>{{ \App\Support\StoreProfile::get('store_name', config('app.name')) }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -27,6 +27,20 @@
             @endisset
 
             <main class="pb-10">
+                @if (session('success') || session('error'))
+                    <div class="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+                        @if (session('success'))
+                            <div role="status" class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 shadow-sm">
+                                <span class="mr-2" aria-hidden="true">✓</span>{{ session('success') }}
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div role="alert" class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800 shadow-sm">
+                                <span class="mr-2" aria-hidden="true">!</span>{{ session('error') }}
+                            </div>
+                        @endif
+                    </div>
+                @endif
                 {{ $slot }}
             </main>
 

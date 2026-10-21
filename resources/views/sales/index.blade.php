@@ -11,7 +11,7 @@
 
     <div class="py-8 sm:py-10">
         <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
-            <form method="GET" action="{{ route('sales.index') }}" class="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 sm:p-5 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))_auto] lg:items-end">
+            <form method="GET" action="{{ route('sales.index') }}" class="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 sm:p-5 lg:grid-cols-3 2xl:grid-cols-[minmax(0,1.5fr)_repeat(5,minmax(0,1fr))_auto] lg:items-end">
                 <div>
                     <label for="search" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Cari transaksi</label>
                     <input id="search" name="search" type="search" value="{{ $search }}" placeholder="No. transaksi, kasir, produk, pelanggan..." class="w-full rounded-xl border-slate-200 bg-slate-50 text-sm focus:border-amber-500 focus:ring-amber-200">
@@ -31,7 +31,25 @@
                         <option value="month" @selected($period === 'month')>Bulanan</option>
                     </select>
                 </div>
-                <div class="flex gap-2 sm:col-span-2 lg:col-span-1">
+                <div>
+                    <label for="cashier_id" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Kasir</label>
+                    <select id="cashier_id" name="cashier_id" class="w-full rounded-xl border-slate-200 bg-slate-50 text-sm focus:border-amber-500 focus:ring-amber-200">
+                        <option value="">Semua kasir</option>
+                        @foreach ($cashiers as $cashier)
+                            <option value="{{ $cashier->id }}" @selected((string) $cashierId === (string) $cashier->id)>{{ $cashier->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="payment_method" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Pembayaran</label>
+                    <select id="payment_method" name="payment_method" class="w-full rounded-xl border-slate-200 bg-slate-50 text-sm focus:border-amber-500 focus:ring-amber-200">
+                        <option value="">Semua metode</option>
+                        @foreach (['Tunai', 'QRIS', 'Debit', 'Kredit', 'E-Wallet', 'Transfer'] as $method)
+                            <option value="{{ $method }}" @selected($paymentMethod === $method)>{{ $method }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex gap-2 sm:col-span-2 lg:col-span-1 2xl:col-span-1">
                     <button type="submit" class="btn-primary w-full">Terapkan</button>
                     <a href="{{ route('sales.index') }}" class="btn-secondary">Reset</a>
                 </div>
@@ -94,7 +112,10 @@
                                     <td class="whitespace-nowrap px-5 py-3 text-slate-700">{{ $sale->customer_type ?: 'Umum' }}</td>
                                     <td class="whitespace-nowrap px-5 py-3 text-slate-700">{{ $sale->payment_method }}</td>
                                     <td class="whitespace-nowrap px-5 py-3 text-right font-bold text-slate-900">Rp {{ number_format((float) $sale->total, 0, ',', '.') }}</td>
-                                    <td class="whitespace-nowrap px-5 py-3 text-right"><a href="{{ route('sales.show', $sale) }}" class="font-bold text-amber-800 underline">Detail</a></td>
+                                    <td class="whitespace-nowrap px-5 py-3 text-right">
+                                        <a href="{{ route('sales.show', $sale) }}" class="font-bold text-amber-800 underline">Detail</a>
+                                        <a href="{{ route('cashier.receipt.preview', $sale) }}" target="_blank" rel="noopener" class="ml-3 font-bold text-slate-600 underline">Struk</a>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr><td colspan="6" class="px-5 py-8 text-center text-slate-500">Tidak ada transaksi yang cocok dengan filter.</td></tr>

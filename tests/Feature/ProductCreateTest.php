@@ -27,7 +27,7 @@ class ProductCreateTest extends TestCase
 
         $response
             ->assertRedirect('/products')
-            ->assertSessionHas('success', 'Product berhasil ditambahkan.');
+            ->assertSessionHas('success', 'Produk berhasil ditambahkan.');
 
         $this->assertDatabaseHas('products', [
             'name' => 'Laptop Gaming',

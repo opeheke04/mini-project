@@ -2,6 +2,8 @@ const products = window.cashierProducts || [];
 const searchInput = document.getElementById('searchProduct');
 const resultsBox = document.getElementById('productResults');
 const cartBody = document.getElementById('cartBody');
+const productGrid = document.getElementById('productGrid');
+const productGridCount = document.getElementById('productGridCount');
 let cart = [];
 let paymentMethod = 'Tunai';
 const heldStorageKey = window.cashierHeldStorageKey;
@@ -71,6 +73,14 @@ const rupiah = (value) => new Intl.NumberFormat('id-ID', {
     maximumFractionDigits: 0,
 }).format(value || 0);
 
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+}[character]));
+
 const valueOf = (id) => Number.parseFloat(document.getElementById(id).value) || 0;
 
 function getTotal() {
@@ -85,6 +95,7 @@ function getTotal() {
 
 function renderResults() {
     const keyword = searchInput.value.trim().toLowerCase();
+    renderProductGrid(keyword);
     if (!keyword) {
         resultsBox.classList.add('hidden');
         return;
@@ -93,11 +104,38 @@ function renderResults() {
     const matches = products.filter((product) => [product.name, product.category || '', product.id].some((field) => String(field).toLowerCase().includes(keyword)));
     resultsBox.innerHTML = matches.length ? matches.map((product) => `
         <button type="button" class="product-result" data-product-id="${product.id}">
-            <span><strong>${product.name}</strong><small>${product.category || 'Produk'} · Stok ${product.stock}</small></span>
+            <span class="flex min-w-0 items-center gap-3">
+                ${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" class="h-10 w-10 rounded-lg object-cover">` : '<span class="product-placeholder inline-flex h-10 w-10 items-center justify-center rounded-lg text-[10px] font-bold text-slate-500">Produk</span>'}
+                <span class="min-w-0"><strong class="block truncate">${escapeHtml(product.name)}</strong><small>${escapeHtml(product.category || 'Produk')} · Stok ${product.stock}</small></span>
+            </span>
             <strong>${rupiah(product.price)}</strong>
         </button>
     `).join('') : '<p class="px-3 py-4 text-center text-sm text-slate-500">Barang tidak ditemukan.</p>';
     resultsBox.classList.remove('hidden');
+}
+
+function renderProductGrid(keyword = '') {
+    if (!productGrid) return;
+
+    const matches = products.filter((product) => !keyword || [product.name, product.category || '', product.id]
+        .some((field) => String(field).toLowerCase().includes(keyword)));
+    const visibleProducts = matches.slice(0, 12);
+    productGridCount.textContent = matches.length > visibleProducts.length
+        ? `Menampilkan ${visibleProducts.length} dari ${matches.length} produk`
+        : `${matches.length} produk ${keyword ? 'ditemukan' : 'tersedia'}`;
+    productGrid.innerHTML = visibleProducts.length ? visibleProducts.map((product) => `
+        <button type="button" class="product-tile" data-product-id="${product.id}" aria-label="Tambahkan ${escapeHtml(product.name)} ke keranjang">
+            ${product.image_url
+                ? `<img class="product-tile-image" src="${escapeHtml(product.image_url)}" alt="" loading="lazy">`
+                : '<span class="product-placeholder product-tile-image">Produk</span>'}
+            <span class="block min-w-0 p-3 text-left">
+                <strong class="block truncate text-sm font-black text-slate-800">${escapeHtml(product.name)}</strong>
+                <span class="mt-1 block truncate text-xs text-slate-500">${escapeHtml(product.category || 'Produk')} · Stok ${product.stock}</span>
+                <span class="mt-2 block text-sm font-black text-amber-800">${rupiah(product.price)}</span>
+            </span>
+            <span class="product-tile-add" aria-hidden="true">+</span>
+        </button>
+    `).join('') : '<p class="col-span-full rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">Produk tidak ditemukan. Coba kata kunci lain.</p>';
 }
 
 function addToCart(productId) {
@@ -111,6 +149,7 @@ function addToCart(productId) {
     }
     searchInput.value = '';
     resultsBox.classList.add('hidden');
+    renderProductGrid();
     renderCart();
 }
 
@@ -121,7 +160,7 @@ function renderCart() {
         cartBody.innerHTML = cart.map((item, index) => `
             <tr>
                 <td class="px-5 py-4 text-slate-400">${index + 1}</td>
-                <td class="px-3 py-4"><strong class="text-slate-800">${item.name}</strong><small class="mt-1 block text-xs text-slate-400">${item.category || 'Produk'}</small></td>
+                <td class="px-3 py-4"><span class="flex min-w-0 items-center gap-2">${item.image_url ? `<img src="${escapeHtml(item.image_url)}" alt="" class="h-10 w-10 rounded-lg object-cover">` : ''}<span class="min-w-0"><strong class="block text-slate-800">${escapeHtml(item.name)}</strong><small class="mt-1 block text-xs text-slate-400">${escapeHtml(item.category || 'Produk')}</small></span></span></td>
                 <td class="whitespace-nowrap px-3 py-4 text-right text-slate-600">${rupiah(item.price)}</td>
                 <td class="px-3 py-4"><div class="qty-control"><button type="button" data-action="decrease" data-product-id="${item.id}">-</button><span>${item.qty}</span><button type="button" data-action="increase" data-product-id="${item.id}">+</button></div></td>
                 <td class="whitespace-nowrap px-3 py-4 text-right font-bold text-slate-800">${rupiah(item.price * item.qty)}</td>
@@ -167,6 +206,10 @@ document.getElementById('searchButton').addEventListener('click', () => {
     else renderResults();
 });
 resultsBox.addEventListener('click', (event) => {
+    const result = event.target.closest('[data-product-id]');
+    if (result) addToCart(result.dataset.productId);
+});
+productGrid?.addEventListener('click', (event) => {
     const result = event.target.closest('[data-product-id]');
     if (result) addToCart(result.dataset.productId);
 });
@@ -353,3 +396,4 @@ document.addEventListener('click', (event) => {
 heldTransactions = readHeldTransactions();
 renderHeldTransactions();
 renderCart();
+renderProductGrid();

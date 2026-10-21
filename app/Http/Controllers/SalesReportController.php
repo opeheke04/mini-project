@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sale;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -18,15 +19,21 @@ class SalesReportController extends Controller
             'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
             'period' => ['nullable', 'in:day,month'],
+            'cashier_id' => ['nullable', 'integer', 'exists:users,id'],
+            'payment_method' => ['nullable', 'in:Tunai,QRIS,Debit,Kredit,E-Wallet,Transfer'],
         ]);
 
         $from = Carbon::parse($validated['from'] ?? now()->startOfMonth()->toDateString())->startOfDay();
         $to = Carbon::parse($validated['to'] ?? ($validated['from'] ?? now()->endOfMonth()->toDateString()))->endOfDay();
         $period = $validated['period'] ?? 'day';
         $search = trim($validated['search'] ?? '');
+        $cashierId = $validated['cashier_id'] ?? null;
+        $paymentMethod = $validated['payment_method'] ?? null;
 
         $salesForRange = Sale::query()
-            ->whereBetween('created_at', [$from, $to]);
+            ->whereBetween('created_at', [$from, $to])
+            ->when($cashierId, fn (Builder $query) => $query->where('user_id', $cashierId))
+            ->when($paymentMethod, fn (Builder $query) => $query->where('payment_method', $paymentMethod));
 
         $summary = (clone $salesForRange)
             ->selectRaw('COUNT(*) as transaction_count, COALESCE(SUM(total), 0) as revenue')
@@ -49,6 +56,8 @@ class SalesReportController extends Controller
         $sales = Sale::query()
             ->with('user:id,name')
             ->whereBetween('created_at', [$from, $to])
+            ->when($cashierId, fn (Builder $query) => $query->where('user_id', $cashierId))
+            ->when($paymentMethod, fn (Builder $query) => $query->where('payment_method', $paymentMethod))
             ->when($search !== '', function (Builder $query) use ($search): void {
                 $query->where(function (Builder $query) use ($search): void {
                     $query->where('transaction_number', 'like', "%{$search}%")
@@ -71,6 +80,9 @@ class SalesReportController extends Controller
             'to' => $to,
             'period' => $period,
             'search' => $search,
+            'cashierId' => $cashierId,
+            'paymentMethod' => $paymentMethod,
+            'cashiers' => User::query()->where('role', 'kasir')->orderBy('name')->get(['id', 'name']),
         ]);
     }
 

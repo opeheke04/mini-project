@@ -13,16 +13,20 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
-        <div class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(191,219,254,0.45),_rgba(248,250,252,1)_35%,_rgba(226,232,240,1)_100%)]">
+        <div class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(254,243,199,0.52),_rgba(248,250,252,1)_35%,_rgba(226,232,240,1)_100%)]">
             <header class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
                 <nav class="glass-panel flex items-center justify-between px-4 py-3 sm:px-6">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-[0_12px_20px_rgba(37,99,235,0.3)]">
-                            <x-application-logo class="h-6 w-6 fill-current" />
-                        </div>
+                        @if (\App\Support\StoreProfile::get('logo') !== '')
+                            <img src="{{ asset('storage/'.\App\Support\StoreProfile::get('logo')) }}" alt="" class="h-11 w-11 rounded-2xl border border-slate-200 bg-white object-contain p-1">
+                        @else
+                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-800 to-slate-950 text-amber-300 shadow-[0_12px_20px_rgba(15,23,42,0.2)]">
+                                <x-application-logo class="h-6 w-6 fill-current" />
+                            </div>
+                        @endif
                         <div>
-                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-amber-700">Retail operations</p>
-                            <h1 class="text-lg font-black text-slate-800">{{ config('app.name') }}</h1>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-amber-700">Operasional toko</p>
+                            <h1 class="text-lg font-black text-slate-800">{{ \App\Support\StoreProfile::get('store_name', config('app.name')) }}</h1>
                         </div>
                     </div>
 
@@ -31,10 +35,10 @@
                             @auth
                                 <a href="{{ route('dashboard') }}" class="btn-secondary">Dashboard</a>
                                 @if (Route::has('products.index'))
-                                    <a href="{{ route('products.index') }}" class="btn-primary">Products</a>
+                                    <a href="{{ route('products.index') }}" class="btn-primary">Produk</a>
                                 @endif
                             @else
-                                <a href="{{ route('login') }}" class="btn-secondary">Login</a>
+                                <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
                             @endauth
                         </div>
                     @endif
@@ -43,7 +47,7 @@
 
             <main class="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
                 <div class="max-w-xl">
-                    <span class="soft-label">Minimarket · Point of Sale</span>
+                    <span class="soft-label">Minimarket · Sistem Kasir</span>
                     <h2 class="mt-5 text-4xl font-black leading-tight text-slate-900 sm:text-5xl">
                         Kelola toko dengan lebih efisien.
                     </h2>
@@ -58,7 +62,7 @@
                                 <a href="{{ route('products.index') }}" class="btn-secondary">Lihat Produk</a>
                             @endif
                         @else
-                            <a href="{{ route('login') }}" class="btn-primary">Login Sekarang</a>
+                            <a href="{{ route('login') }}" class="btn-primary">Masuk Sekarang</a>
                         @endif
                     </div>
 
@@ -80,16 +84,16 @@
                         </div>
                         <div class="glass-panel p-4">
                             <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Stok</p>
-                            <p class="mt-3 text-2xl font-black text-indigo-600">{{ $stockTotal }}</p>
+                            <p class="mt-3 text-2xl font-black text-amber-800">{{ $stockTotal }}</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="hero-ring w-full max-w-xl rounded-[30px] border border-slate-200 bg-white/80 p-5 shadow-[0_25px_70px_rgba(59,130,246,0.16)] backdrop-blur-sm">
-                        <div class="rounded-[24px] border border-slate-200 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-6 text-white">
+                        <div class="rounded-[24px] border border-slate-200 bg-gradient-to-br from-slate-950 via-slate-800 to-slate-700 p-6 text-white">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-200">Overview</p>
+                                <p class="text-xs font-bold uppercase tracking-[0.2em] text-amber-200">Ringkasan</p>
                                 <h3 class="mt-2 text-2xl font-black">Dashboard Produk</h3>
                             </div>
                             <span class="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-bold text-emerald-300">Online</span>
@@ -106,7 +110,7 @@
                             </div>
                             <div class="rounded-2xl border border-white/10 bg-white/5 p-4 sm:col-span-2">
                                 <p class="text-xs uppercase tracking-[0.18em] text-slate-300">Status</p>
-                                <p class="mt-3 text-base font-semibold text-blue-100">Semua produk siap dipantau dan dikelola.</p>
+                                <p class="mt-3 text-base font-semibold text-slate-100">Semua produk siap dipantau dan dikelola.</p>
                             </div>
                         </div>
                     </div>
