@@ -61,6 +61,30 @@ Open the URL shown by Artisan (normally `http://127.0.0.1:8000`). For frontend d
 - The `admin` and `cek.role` middleware enforce the role restrictions.
 - Public registration is disabled. Admins can create cashier accounts from the **Akun Kasir** menu; new accounts require a password of at least 16 characters containing letters and numbers.
 
+## Laravel Books API (Acara 25-26)
+
+The API practical exercise demonstrates Laravel's MVC flow, JSON responses, API Resources, and REST CRUD operations for books. Run migrations and start the application first:
+
+```powershell
+php artisan migrate
+php artisan serve
+```
+
+All endpoints are under `/api/books` and accept JSON. Send `Accept: application/json` so validation and not-found errors are returned as JSON.
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/api/books` | List books |
+| `POST` | `/api/books` | Create a book (`title` required; `description` and non-negative integer `status` optional) |
+| `GET` | `/api/books/{id}` | Show a book |
+| `PUT` | `/api/books/{id}` | Replace a book (`title`, `description`, and `status` required; nullable fields may be `null`) |
+| `PATCH` | `/api/books/{id}` | Partially update a book |
+| `DELETE` | `/api/books/{id}` | Delete a book |
+
+Book data is returned through `BookResource` under a `data` key; validation errors use HTTP `422`, missing books use `404`, and successful creation uses `201`.
+
+For Acara 26, import [Acara-25-26-Laravel-Books-API.postman_collection.json](./postman/collections/Acara-25-26-Laravel-Books-API.postman_collection.json) into Postman and run the requests in order with Collection Runner. The create request saves the new ID for the show, update, and delete requests. The collection defaults to `http://127.0.0.1:8000/api`.
+
 ## Low-stock alerts
 
 The dashboard, product list, and cashier screen flag active products with stock at or below `LOW_STOCK_THRESHOLD`. The default is 5 units. Set that environment variable to another non-negative whole number and clear the config cache after changing it:

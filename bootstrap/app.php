@@ -11,8 +11,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 // Import class middleware Anda
 use App\Http\Middleware\Admin;
-use App\Http\Middleware\CekRole;
-use App\Http\Middleware\LogAktivitas;
+use App\Http\Middleware\RoleMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -23,12 +22,14 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: '/api',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        
+        $middleware->statefulApi();
+        $middleware->throttleApi();
+
         // 1. Mendaftarkan Alias Middleware (Untuk Route Khusus)
         $middleware->alias([
-            'admin'         => Admin::class,
-            'role'          => CekRole::class,
-            'log.aktivitas' => LogAktivitas::class,
+            'admin' => Admin::class,
+            'role' => RoleMiddleware::class,
+            'cek.role' => RoleMiddleware::class,
         ]);
 
         // 2. Jika ingin dijadikan Middleware Global (Berjalan di SELURUH request):

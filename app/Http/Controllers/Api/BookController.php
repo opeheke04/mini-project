@@ -3,82 +3,78 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BookResource;
 use App\Models\Book;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class BookController extends Controller
 {
-    // Menampilkan semua buku
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
-        return response()->json(Book::all(), 200);
+        return BookResource::collection(Book::query()->orderBy('id')->get());
     }
 
-    // Menyimpan buku baru
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'status' => 'required',
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'status' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $book = Book::create($validated);
 
-        return response()->json($book, 201);
+        return (new BookResource($book))
+            ->response()
+            ->setStatusCode(201);
     }
 
-    // Menampilkan satu buku berdasarkan ID
-    public function show($id)
+    public function show(string $id): BookResource|JsonResponse
     {
         $book = Book::find($id);
 
-        if (!$book) {
-            return response()->json([
-                'message' => 'Book not found'
-            ], 404);
+        if (! $book) {
+            return response()->json(['message' => 'Book not found'], 404);
         }
 
-        return response()->json($book, 200);
+        return new BookResource($book);
     }
 
-    // Memperbarui buku
-    public function update(Request $request, $id)
+    public function update(Request $request, string $id): BookResource|JsonResponse
     {
         $book = Book::find($id);
 
-        if (!$book) {
-            return response()->json([
-                'message' => 'Book not found'
-            ], 404);
+        if (! $book) {
+            return response()->json(['message' => 'Book not found'], 404);
         }
+
+        $isPartialUpdate = $request->isMethod('PATCH');
+        $required = $isPartialUpdate ? 'sometimes' : 'required';
+        $present = $isPartialUpdate ? 'sometimes' : 'present';
 
         $validated = $request->validate([
-            'title' => 'sometimes|required|string',
-            'description' => 'sometimes|required|string',
-            'status' => 'sometimes|required',
+            'title' => [$required, 'string', 'max:255'],
+            'description' => [$present, 'nullable', 'string'],
+            'status' => [$present, 'nullable', 'integer', 'min:0'],
         ]);
 
         $book->update($validated);
 
-        return response()->json($book, 200);
+        return new BookResource($book->refresh());
     }
 
-    // Menghapus buku
-    public function destroy($id)
+    public function destroy(string $id): JsonResponse
     {
         $book = Book::find($id);
 
-        if (!$book) {
-            return response()->json([
-                'message' => 'Book not found'
-            ], 404);
+        if (! $book) {
+            return response()->json(['message' => 'Book not found'], 404);
         }
 
         $book->delete();
 
-        return response()->json([
-            'message' => 'Book deleted'
-        ], 200);
+        return response()->json(['message' => 'Book deleted'], 200);
     }
 }
