@@ -18,6 +18,10 @@ textarea:focus-visible {
     @apply outline-none ring-4 ring-amber-200;
 }
 
+button:disabled {
+    @apply cursor-not-allowed opacity-50;
+}
+
 body {
     @apply bg-slate-100 text-slate-800 antialiased;
     background-image: radial-gradient(circle at 8% 0%, rgba(245, 158, 11, 0.06), transparent 24%), linear-gradient(145deg, #f8fafc 0%, #f3f5f8 52%, #edf0f4 100%);
@@ -227,6 +231,44 @@ body {
     animation: cashier-enter 450ms ease-out both;
 }
 
+.cashier-layout {
+    scroll-margin-top: 5rem;
+}
+
+.cashier-toast {
+    @apply mb-5 rounded-xl border px-4 py-3 text-sm font-semibold shadow-sm;
+    animation: cashier-enter 180ms ease-out both;
+}
+
+.cashier-toast-success {
+    @apply border-emerald-200 bg-emerald-50 text-emerald-900;
+}
+
+.cashier-toast-error {
+    @apply border-rose-200 bg-rose-50 text-rose-900;
+}
+
+.cashier-toast-info {
+    @apply border-slate-200 bg-white text-slate-800;
+}
+
+.cashier-mobile-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid rgb(226 232 240 / 0.9);
+    background: rgb(255 255 255 / 0.96);
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 30px rgb(15 23 42 / 0.1);
+    backdrop-filter: blur(14px);
+}
+
 .transaction-ticket {
     border: 1px dashed rgb(148 163 184 / 0.7);
     border-radius: 1rem;
@@ -298,6 +340,14 @@ body {
     @apply relative min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-amber-200;
 }
 
+.product-tile:disabled {
+    @apply opacity-70;
+}
+
+.product-tile:disabled:hover {
+    transform: none;
+}
+
 .product-tile-image {
     @apply block h-28 w-full bg-slate-100 object-cover sm:h-32;
 }
@@ -315,15 +365,15 @@ body {
 }
 
 .qty-control button {
-    @apply h-8 w-8 font-bold text-slate-500 transition hover:bg-amber-600 hover:text-white;
+    @apply h-10 w-10 font-bold text-slate-500 transition hover:bg-amber-600 hover:text-white;
 }
 
 .qty-control span {
-    @apply flex h-8 min-w-8 items-center justify-center border-x border-slate-200 px-2 text-xs font-bold text-slate-700;
+    @apply flex h-10 min-w-9 items-center justify-center border-x border-slate-200 px-2 text-xs font-bold text-slate-700;
 }
 
 .remove-item {
-    @apply text-xl font-bold leading-none text-slate-300 transition hover:text-rose-600;
+    @apply inline-flex h-10 w-10 items-center justify-center text-xl font-bold leading-none text-slate-400 transition hover:text-rose-600;
 }
 
 .empty-cart {
@@ -385,5 +435,15 @@ body {
     .payment-summary-card,
     .payment-card {
         box-shadow: 0 12px 28px rgb(30 41 59 / 0.08);
+    }
+
+    .cashier-mobile-bar .btn-primary {
+        box-shadow: 0 6px 16px rgb(15 23 42 / 0.18);
+    }
+}
+
+@media (max-width: 1279px) {
+    .cashier-page {
+        padding-bottom: 6rem;
     }
 }

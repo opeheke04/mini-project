@@ -22,6 +22,7 @@
     </x-slot>
 
     <div class="cashier-page mx-auto max-w-[1600px] px-4 py-7 sm:px-6 lg:px-8">
+        <div id="cashierToast" class="cashier-toast hidden" role="status" aria-live="polite" aria-atomic="true"></div>
         @if ($lowStockProducts->isNotEmpty())
             <section class="mb-6 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 shadow-sm sm:p-5" aria-label="Peringatan stok menipis">
                 <div class="flex items-start gap-3">
@@ -43,16 +44,18 @@
                 </div>
             </section>
         @endif
-        <div class="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
+        <div class="cashier-layout grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
             <section class="min-w-0 space-y-6">
                 <div class="panel-surface search-panel overflow-visible">
                     <div class="panel-heading border-b border-slate-100 px-5 py-4">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex items-start gap-3">
-                                <span class="heading-icon bg-amber-100 text-amber-800">+</span>
+                                <span class="heading-icon bg-amber-100 text-amber-800" aria-hidden="true">
+                                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M10 4v12M4 10h12" /></svg>
+                                </span>
                                 <div>
                                 <h3 class="font-black text-slate-900">Tambah Barang</h3>
-                                <p class="mt-1 text-xs text-slate-500">Gunakan nama barang, kode, atau barcode.</p>
+                                <p class="mt-1 text-xs text-slate-500">Cari berdasarkan nama atau kategori barang.</p>
                                 </div>
                             </div>
                             <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">F2 Cari</span>
@@ -62,7 +65,7 @@
                         <div class="relative flex gap-3">
                             <div class="relative min-w-0 flex-1">
                                 <label for="searchProduct" class="sr-only">Cari produk</label>
-                                <input id="searchProduct" type="search" autocomplete="off" class="w-full rounded-xl border-slate-200 bg-slate-50 py-3 pl-4 pr-4 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500" placeholder="Cari nama barang / kode / barcode...">
+                                <input id="searchProduct" type="search" autocomplete="off" class="w-full rounded-xl border-slate-200 bg-slate-50 py-3 pl-4 pr-4 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500" placeholder="Cari nama atau kategori barang...">
                                 <div id="productResults" class="absolute inset-x-0 top-full z-20 mt-2 hidden max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl"></div>
                             </div>
                             <button type="button" id="searchButton" class="btn-primary shrink-0 px-5">Cari</button>
@@ -93,13 +96,15 @@
                         </div>
                         <span id="productGridCount" class="w-fit rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-900">{{ $products->count() }} produk tersedia</span>
                     </div>
-                    <div id="productGrid" class="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 sm:p-5 lg:grid-cols-4"></div>
+                    <div id="productGrid" class="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 sm:p-5 lg:grid-cols-4" aria-live="polite"></div>
                 </section>
 
                 <div class="panel-surface cart-panel overflow-hidden">
                     <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                         <div class="flex items-start gap-3">
-                            <span class="heading-icon bg-amber-100 text-amber-700">▣</span>
+                            <span class="heading-icon bg-amber-100 text-amber-700" aria-hidden="true">
+                                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l1.5 9h8.8l1.5-6H6M8 16a.75.75 0 1 0 0 .01M14 16a.75.75 0 1 0 0 .01" /></svg>
+                            </span>
                             <div>
                                 <h3 class="font-black text-slate-900">Keranjang Belanja</h3>
                             <p class="mt-1 text-xs text-slate-500">Atur jumlah barang sebelum pembayaran.</p>
@@ -107,8 +112,8 @@
                         </div>
                         <span id="itemCount" class="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">0 Item</span>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-[620px] text-left text-sm">
+                    <div class="overflow-x-auto" role="region" aria-label="Daftar barang di keranjang" tabindex="0">
+                        <table class="min-w-[540px] text-left text-sm sm:min-w-[620px]">
                             <thead class="bg-slate-50 text-[11px] uppercase tracking-[0.14em] text-slate-500">
                                 <tr>
                                     <th class="px-5 py-3">No</th>
@@ -126,7 +131,7 @@
             </section>
 
             <aside class="min-w-0 space-y-6 xl:sticky xl:top-6 xl:self-start">
-                <div class="panel-surface payment-summary-card overflow-hidden">
+                <div id="paymentSummary" class="panel-surface payment-summary-card overflow-hidden">
                     <div class="payment-card-heading border-b border-slate-100 px-5 py-4">
                         <span class="soft-label mb-2">Ringkas & jelas</span>
                         <h3 class="font-black text-slate-900">Ringkasan Pembayaran</h3>
@@ -146,7 +151,7 @@
                     </div>
                 </div>
 
-                <div class="panel-surface payment-card overflow-hidden">
+                <div id="paymentPanel" class="panel-surface payment-card overflow-hidden">
                     <div class="payment-card-heading border-b border-slate-100 px-5 py-4">
                         <span class="soft-label mb-2">Langkah terakhir</span>
                         <h3 class="font-black text-slate-900">Pembayaran</h3>
@@ -208,6 +213,13 @@
             <span>Kasir: <strong class="text-slate-700">{{ auth()->user()->name }}</strong></span>
             <span>F2 Cari Barang · F4 Bayar · ESC Batal</span>
         </div>
+    </div>
+    <div class="cashier-mobile-bar xl:hidden">
+        <div class="flex min-w-0 flex-col">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total sementara</span>
+            <strong id="mobileGrandTotal" class="truncate text-base font-black text-slate-950">Rp 0</strong>
+        </div>
+        <button type="button" id="mobileCheckoutButton" class="btn-primary min-h-11 shrink-0 px-4">Lanjut Bayar</button>
     </div>
 
     @push('scripts')

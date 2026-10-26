@@ -8,6 +8,22 @@ let cart = [];
 let paymentMethod = 'Tunai';
 const heldStorageKey = window.cashierHeldStorageKey;
 let heldTransactions = [];
+let toastTimeout;
+
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('cashierToast');
+    if (!toast) return;
+
+    window.clearTimeout(toastTimeout);
+    toast.textContent = message;
+    toast.className = `cashier-toast cashier-toast-${type}`;
+    toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    toast.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+    toast.hidden = false;
+    toastTimeout = window.setTimeout(() => {
+        toast.hidden = true;
+    }, type === 'error' ? 7000 : 4500);
+}
 
 function readHeldTransactions() {
     try {
@@ -19,7 +35,7 @@ function readHeldTransactions() {
         return parsed;
     } catch (error) {
         console.error('Could not read held cashier transactions:', error);
-        window.alert('Transaksi ditahan tidak dapat dibaca dari penyimpanan browser. Data tidak dihapus.');
+        showToast('Transaksi ditahan tidak dapat dibaca dari penyimpanan browser. Data tidak dihapus.', 'error');
         return [];
     }
 }
@@ -32,7 +48,7 @@ function saveHeldTransactions(transactions) {
         return true;
     } catch (error) {
         console.error('Could not save held cashier transactions:', error);
-        window.alert('Transaksi tidak dapat ditahan. Penyimpanan browser penuh atau tidak tersedia.');
+        showToast('Transaksi tidak dapat ditahan. Penyimpanan browser penuh atau tidak tersedia.', 'error');
         return false;
     }
 }
@@ -103,14 +119,14 @@ function renderResults() {
 
     const matches = products.filter((product) => [product.name, product.category || '', product.id].some((field) => String(field).toLowerCase().includes(keyword)));
     resultsBox.innerHTML = matches.length ? matches.map((product) => `
-        <button type="button" class="product-result" data-product-id="${product.id}">
+        <button type="button" class="product-result" data-product-id="${product.id}" ${product.stock < 1 ? 'disabled' : ''}>
             <span class="flex min-w-0 items-center gap-3">
                 ${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" class="h-10 w-10 rounded-lg object-cover">` : '<span class="product-placeholder inline-flex h-10 w-10 items-center justify-center rounded-lg text-[10px] font-bold text-slate-500">Produk</span>'}
-                <span class="min-w-0"><strong class="block truncate">${escapeHtml(product.name)}</strong><small>${escapeHtml(product.category || 'Produk')} · Stok ${product.stock}</small></span>
+                <span class="min-w-0"><strong class="block truncate">${escapeHtml(product.name)}</strong><small>${escapeHtml(product.category || 'Produk')} · ${product.stock < 1 ? 'Stok habis' : `Stok ${product.stock}`}</small></span>
             </span>
-            <strong>${rupiah(product.price)}</strong>
+            <strong>${product.stock < 1 ? 'Habis' : rupiah(product.price)}</strong>
         </button>
-    `).join('') : '<p class="px-3 py-4 text-center text-sm text-slate-500">Barang tidak ditemukan.</p>';
+    `).join('') : `<p class="px-3 py-4 text-center text-sm text-slate-500">${products.length ? 'Barang tidak ditemukan.' : 'Belum ada produk aktif untuk dijual.'}</p>`;
     resultsBox.classList.remove('hidden');
 }
 
@@ -124,26 +140,34 @@ function renderProductGrid(keyword = '') {
         ? `Menampilkan ${visibleProducts.length} dari ${matches.length} produk`
         : `${matches.length} produk ${keyword ? 'ditemukan' : 'tersedia'}`;
     productGrid.innerHTML = visibleProducts.length ? visibleProducts.map((product) => `
-        <button type="button" class="product-tile" data-product-id="${product.id}" aria-label="Tambahkan ${escapeHtml(product.name)} ke keranjang">
+        <button type="button" class="product-tile" data-product-id="${product.id}" aria-label="${product.stock < 1 ? `${escapeHtml(product.name)}, stok habis` : `Tambahkan ${escapeHtml(product.name)} ke keranjang`}" ${product.stock < 1 ? 'disabled' : ''}>
             ${product.image_url
                 ? `<img class="product-tile-image" src="${escapeHtml(product.image_url)}" alt="" loading="lazy">`
                 : '<span class="product-placeholder product-tile-image">Produk</span>'}
             <span class="block min-w-0 p-3 text-left">
                 <strong class="block truncate text-sm font-black text-slate-800">${escapeHtml(product.name)}</strong>
-                <span class="mt-1 block truncate text-xs text-slate-500">${escapeHtml(product.category || 'Produk')} · Stok ${product.stock}</span>
-                <span class="mt-2 block text-sm font-black text-amber-800">${rupiah(product.price)}</span>
+                <span class="mt-1 block truncate text-xs text-slate-500">${escapeHtml(product.category || 'Produk')} · ${product.stock < 1 ? 'Stok habis' : `Stok ${product.stock}`}</span>
+                <span class="mt-2 block text-sm font-black text-amber-800">${product.stock < 1 ? 'Tidak tersedia' : rupiah(product.price)}</span>
             </span>
-            <span class="product-tile-add" aria-hidden="true">+</span>
+            ${product.stock > 0 ? '<span class="product-tile-add" aria-hidden="true">+</span>' : ''}
         </button>
-    `).join('') : '<p class="col-span-full rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">Produk tidak ditemukan. Coba kata kunci lain.</p>';
+    `).join('') : `<div class="col-span-full rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">${products.length ? 'Produk tidak ditemukan. Coba kata kunci lain.' : 'Belum ada produk aktif. Produk yang tersedia akan muncul di sini.'}</div>`;
 }
 
 function addToCart(productId) {
     const product = products.find((item) => item.id === Number(productId));
     if (!product) return;
+    if (product.stock < 1) {
+        showToast(`${product.name} sedang habis dan tidak dapat ditambahkan.`, 'error');
+        return;
+    }
     const existing = cart.find((item) => item.id === product.id);
     if (existing) {
-        if (existing.qty < product.stock) existing.qty += 1;
+        if (existing.qty >= product.stock) {
+            showToast(`Stok ${product.name} hanya ${product.stock} unit.`, 'error');
+            return;
+        }
+        existing.qty += 1;
     } else {
         cart.push({ ...product, qty: 1 });
     }
@@ -151,6 +175,7 @@ function addToCart(productId) {
     resultsBox.classList.add('hidden');
     renderProductGrid();
     renderCart();
+    showToast(`${product.name} ditambahkan ke keranjang.`, 'success');
 }
 
 function renderCart() {
@@ -174,6 +199,7 @@ function renderCart() {
     document.getElementById('totalQty').textContent = quantity;
     document.getElementById('subtotal').textContent = rupiah(totals.subtotal);
     document.getElementById('grandTotal').textContent = rupiah(totals.total);
+    document.getElementById('mobileGrandTotal').textContent = rupiah(totals.total);
     updateChange();
 }
 
@@ -235,7 +261,7 @@ document.getElementById('cancelButton').addEventListener('click', () => {
 });
 document.getElementById('holdButton').addEventListener('click', () => {
     if (!cart.length) {
-        window.alert('Tidak ada transaksi untuk ditahan.');
+        showToast('Keranjang masih kosong. Tambahkan produk sebelum menahan transaksi.', 'error');
         return;
     }
 
@@ -259,12 +285,12 @@ document.getElementById('holdButton').addEventListener('click', () => {
     resetTransaction();
     document.getElementById('heldTransactionsSelect').value = held.id;
     renderHeldTransactions();
-    window.alert('Transaksi berhasil ditahan. Buka kembali dari daftar Transaksi Ditahan.');
+    showToast('Transaksi berhasil ditahan. Anda dapat membukanya kembali dari daftar transaksi ditahan.', 'success');
 });
 
 document.getElementById('resumeHeldButton').addEventListener('click', () => {
     if (cart.length) {
-        window.alert('Tahan atau batalkan transaksi aktif sebelum membuka transaksi yang ditahan.');
+        showToast('Tahan atau batalkan transaksi aktif sebelum membuka transaksi yang ditahan.', 'error');
         return;
     }
 
@@ -291,7 +317,7 @@ document.getElementById('resumeHeldButton').addEventListener('click', () => {
     }
     renderCart();
     searchInput.focus();
-    window.alert('Transaksi berhasil dibuka kembali. Periksa ketersediaan stok sebelum pembayaran.');
+    showToast('Transaksi dibuka kembali. Periksa ketersediaan stok sebelum pembayaran.', 'success');
 });
 
 document.getElementById('deleteHeldButton').addEventListener('click', () => {
@@ -305,6 +331,10 @@ document.getElementById('deleteHeldButton').addEventListener('click', () => {
 });
 
 document.getElementById('heldTransactionsSelect').addEventListener('change', renderHeldTransactions);
+document.getElementById('mobileCheckoutButton').addEventListener('click', () => {
+    document.getElementById('paymentPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.setTimeout(() => document.getElementById('payment').focus({ preventScroll: true }), 350);
+});
 window.addEventListener('storage', (event) => {
     if (event.key !== heldStorageKey) return;
     heldTransactions = readHeldTransactions();
@@ -340,8 +370,8 @@ async function printReceipt(transactionId, receiptWindow, previewUrl) {
 
 document.getElementById('payButton').addEventListener('click', async (event) => {
     const button = event.currentTarget;
-    if (!cart.length) return window.alert('Keranjang masih kosong.');
-    if (valueOf('payment') < getTotal().total) return window.alert('Uang pembayaran masih kurang.');
+    if (!cart.length) return showToast('Keranjang masih kosong. Tambahkan produk sebelum membayar.', 'error');
+    if (valueOf('payment') < getTotal().total) return showToast('Uang pembayaran masih kurang dari total transaksi.', 'error');
 
     const receiptWindow = window.open('about:blank', '_blank');
     button.disabled = true;
@@ -373,13 +403,14 @@ document.getElementById('payButton').addEventListener('click', async (event) => 
 
         await printReceipt(result.transaction.id, receiptWindow, result.transaction.print_url);
         if (!receiptWindow) {
-            window.alert('Transaksi berhasil. Izinkan pop-up browser untuk mencetak struk, atau cetak ulang dari detail transaksi.');
+            showToast('Transaksi berhasil. Izinkan pop-up untuk mencetak struk, atau cetak ulang dari detail transaksi.', 'info');
+        } else {
+            showToast(`${result.message} No. Transaksi: ${result.transaction.number}. Total ${rupiah(result.transaction.total)} · Kembalian ${rupiah(result.transaction.change)}.`, 'success');
         }
-        window.alert(`${result.message}\nNo. Transaksi: ${result.transaction.number}\nTotal: ${rupiah(result.transaction.total)}\nKembalian: ${rupiah(result.transaction.change)}`);
         resetTransaction();
     } catch (error) {
         if (receiptWindow) receiptWindow.close();
-        window.alert(error.message || 'Tidak dapat menghubungi server.');
+        showToast(error.message || 'Tidak dapat menghubungi server. Periksa koneksi lalu coba lagi.', 'error');
     } finally {
         button.disabled = false;
     }
