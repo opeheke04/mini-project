@@ -44,6 +44,26 @@
                 {{ $slot }}
             </main>
 
+            {{-- Ditambahkan: listener Echo untuk notifikasi order dari Reverb --}}
+            @auth
+                <script>
+                    window.Echo.private('user.{{ auth()->id() }}')
+                        .listen('.order.placed', (event) => {
+                            window.Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: `Order #${event.order_id} telah ditempatkan!`,
+                                text: `Total: Rp ${new Intl.NumberFormat('id-ID').format(Number(event.total))}`,
+                                showConfirmButton: false,
+                                timer: 5000,
+                                timerProgressBar: true,
+                            });
+                            console.log('Order Placed:', event);
+                        });
+                </script>
+            @endauth
+
             @stack('scripts')
         </div>
     </body>

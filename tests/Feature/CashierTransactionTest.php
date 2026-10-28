@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Events\OrderPlaced;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class CashierTransactionTest extends TestCase
@@ -21,6 +23,7 @@ class CashierTransactionTest extends TestCase
             'stock' => 5,
             'is_active' => true,
         ]);
+        Event::fake();
 
         $response = $this->actingAs($user)->postJson('/cashier/transactions', [
             'items' => [['product_id' => $product->id, 'quantity' => 2]],
@@ -29,10 +32,14 @@ class CashierTransactionTest extends TestCase
             'payment_method' => 'Tunai',
         ]);
 
+        $sale = Sale::firstOrFail();
         $response->assertCreated()
             ->assertJsonPath('transaction.total', '25000.00')
             ->assertJsonPath('transaction.change', '5000.00')
-            ->assertJsonPath('transaction.print_url', route('cashier.receipt.preview', Sale::first()));
+            ->assertJsonPath('transaction.print_url', route('cashier.receipt.preview', $sale));
+
+        Event::assertDispatched(OrderPlaced::class, fn (OrderPlaced $event): bool => $event->order->is($sale)
+            && $event->user->is($user));
 
         $this->assertDatabaseHas('sales', [
             'user_id' => $user->id,

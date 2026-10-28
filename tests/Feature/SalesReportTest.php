@@ -73,6 +73,27 @@ class SalesReportTest extends TestCase
             ->assertSeeText('081234567890');
     }
 
+    public function test_admin_can_download_a_sale_invoice_as_pdf(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $product = Product::factory()->create(['name' => 'Kopi Latte']);
+        $sale = $this->createSale('TRX-INVOICE-001', '15000.00', now()->toDateTimeString());
+        SaleItem::create([
+            'sale_id' => $sale->id,
+            'product_id' => $product->id,
+            'product_name' => 'Kopi Latte',
+            'unit_price' => 15000,
+            'quantity' => 1,
+            'line_total' => 15000,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('sales.invoice', $sale))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf')
+            ->assertHeader('content-disposition', 'attachment; filename=invoice_' . $sale->id . '.pdf');
+    }
+
     public function test_admin_can_filter_reports_by_cashier_and_payment_method(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

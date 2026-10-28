@@ -9,6 +9,7 @@ use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\StockRestockController;
 use App\Http\Controllers\StoreSettingsController;
 use App\Http\Controllers\StrukController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,7 +17,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return auth()->user()->role === 'admin'
+    return Auth::user()->role === 'admin'
         ? redirect()->route('admin.dashboard')
         : redirect()->route('cashier.index');
 })->middleware('auth')->name('dashboard');
@@ -50,6 +51,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/store-settings', [StoreSettingsController::class, 'update'])->name('admin.store-settings.update');
     Route::post('/admin/store-settings/test-print', [StoreSettingsController::class, 'testPrint'])->name('admin.store-settings.test-print');
     Route::get('/sales', [SalesReportController::class, 'index'])->name('sales.index');
+    Route::get('/sales/{sale}/invoice', [SalesReportController::class, 'invoice'])->name('sales.invoice');
     Route::get('/sales/{sale}', [SalesReportController::class, 'show'])->name('sales.show');
 });
 

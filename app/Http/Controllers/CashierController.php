@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrderPlaced;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\User;
 use App\Support\StoreProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -62,7 +64,10 @@ class CashierController extends Controller
             'payment_method' => ['required', 'in:Tunai,QRIS,Debit,Kredit,E-Wallet,Transfer'],
         ]);
 
-        $sale = DB::transaction(function () use ($request, $validated) {
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+
+        $sale = DB::transaction(function () use ($user, $validated) {
             $productIds = collect($validated['items'])->pluck('product_id');
             $products = Product::query()
                 ->whereIn('id', $productIds)
@@ -120,7 +125,7 @@ class CashierController extends Controller
 
             $sale = Sale::create([
                 'transaction_number' => 'TRX-'.now()->format('Ymd-His').'-'.Str::upper(Str::random(6)),
-                'user_id' => $request->user()->id,
+                'user_id' => $user->id,
                 'customer_type' => $validated['customer_type'] ?? null,
                 'customer_contact' => $validated['customer_contact'] ?? null,
                 'subtotal' => $this->fromCents($subtotalCents),
@@ -149,6 +154,8 @@ class CashierController extends Controller
 
             return $sale;
         });
+
+        OrderPlaced::dispatch($sale, $user);
 
         return response()->json([
             'message' => 'Transaksi berhasil disimpan.',

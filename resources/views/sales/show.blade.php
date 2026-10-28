@@ -6,6 +6,7 @@
                 <h2 class="mt-1 font-mono text-xl font-black text-slate-900 sm:text-2xl">{{ $sale->transaction_number }}</h2>
             </div>
             <div class="flex items-center gap-3">
+                <a href="{{ route('sales.invoice', $sale) }}" class="btn-secondary">Unduh Invoice PDF</a>
                 <button type="button" id="reprintReceiptButton" class="btn-primary">Cetak Ulang Struk</button>
                 <a href="{{ route('sales.index') }}" class="btn-secondary">Kembali ke riwayat</a>
             </div>

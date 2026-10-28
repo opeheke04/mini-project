@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -91,5 +92,13 @@ class SalesReportController extends Controller
         $sale->load(['user:id,name', 'items']);
 
         return view('sales.show', compact('sale'));
+    }
+
+    public function invoice(Sale $sale)
+    {
+        $sale->load(['user:id,name', 'items']);
+
+        return Pdf::loadView('invoices.invoice', compact('sale'))
+            ->download('invoice_' . $sale->id . '.pdf');
     }
 }
