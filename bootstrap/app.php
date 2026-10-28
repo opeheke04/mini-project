@@ -2,16 +2,17 @@
 
 // File: bootstrap/app.php
 
+use App\Http\Middleware\Admin;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
-use Illuminate\Session\TokenMismatchException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
 // Import class middleware Anda
-use App\Http\Middleware\Admin;
-use App\Http\Middleware\RoleMiddleware;
+use Illuminate\Session\TokenMismatchException;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -30,6 +31,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => Admin::class,
             'role' => RoleMiddleware::class,
             'cek.role' => RoleMiddleware::class,
+            'abilities' => CheckAbilities::class,
+            'ability' => CheckForAnyAbility::class,
         ]);
 
         // 2. Jika ingin dijadikan Middleware Global (Berjalan di SELURUH request):

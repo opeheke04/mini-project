@@ -40,6 +40,11 @@
                             <div class="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
                                 <dl class="space-y-5">
                                     <div>
+                                        <dt class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{{ __('Barcode') }}</dt>
+                                        <dd class="mt-1 font-mono text-base font-medium text-slate-800">{{ $product->barcode ?: '-' }}</dd>
+                                    </div>
+
+                                    <div>
                                         <dt class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{{ __('Category') }}</dt>
                                         <dd class="mt-1 text-base font-medium text-slate-800">{{ $product->category ?: '-' }}</dd>
                                     </div>

@@ -21,7 +21,7 @@ class CashierController extends Controller
             ->where('is_active', true)
             ->where('stock', '>', 0)
             ->orderBy('name')
-            ->get(['id', 'name', 'category', 'price', 'stock', 'image'])
+            ->get(['id', 'name', 'barcode', 'category', 'price', 'stock', 'image'])
             ->each(function (Product $product): void {
                 $product->setAttribute(
                     'image_url',

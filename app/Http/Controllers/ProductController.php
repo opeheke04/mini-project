@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class ProductController extends Controller
 {
@@ -49,6 +52,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name'        => 'required|string|max:255',
+            'barcode'     => ['nullable', 'string', 'max:64', Rule::unique('products', 'barcode')],
             'category'    => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
@@ -60,7 +64,20 @@ class ProductController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('products', 'public');
+            $imageFile = $request->file('image');
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($imageFile->getRealPath());
+
+            $image->cover(800, 800);
+
+            Storage::disk('public')->makeDirectory('products');
+
+            $filename = time() . '_' . Str::random(10) . '.jpg';
+            $path = 'products/' . $filename;
+
+            Storage::disk('public')->put($path, (string) $image->toJpeg(90));
+
+            $validated['image'] = $path;
         }
 
         Product::create($validated);
@@ -93,6 +110,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name'        => 'required|string|max:255',
+            'barcode'     => ['nullable', 'string', 'max:64', Rule::unique('products', 'barcode')->ignore($product->id)],
             'category'    => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
@@ -108,7 +126,20 @@ class ProductController extends Controller
                 Storage::disk('public')->delete($product->image);
             }
 
-            $validated['image'] = $request->file('image')->store('products', 'public');
+            $imageFile = $request->file('image');
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($imageFile->getRealPath());
+
+            $image->cover(800, 800);
+
+            Storage::disk('public')->makeDirectory('products');
+
+            $filename = time() . '_' . Str::random(10) . '.jpg';
+            $path = 'products/' . $filename;
+
+            Storage::disk('public')->put($path, (string) $image->toJpeg(90));
+
+            $validated['image'] = $path;
         }
 
         $product->update($validated);

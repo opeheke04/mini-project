@@ -117,12 +117,12 @@ function renderResults() {
         return;
     }
 
-    const matches = products.filter((product) => [product.name, product.category || '', product.id].some((field) => String(field).toLowerCase().includes(keyword)));
+    const matches = products.filter((product) => [product.name, product.category || '', product.barcode || '', product.id].some((field) => String(field).toLowerCase().includes(keyword)));
     resultsBox.innerHTML = matches.length ? matches.map((product) => `
         <button type="button" class="product-result" data-product-id="${product.id}" ${product.stock < 1 ? 'disabled' : ''}>
             <span class="flex min-w-0 items-center gap-3">
                 ${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" class="h-10 w-10 rounded-lg object-cover">` : '<span class="product-placeholder inline-flex h-10 w-10 items-center justify-center rounded-lg text-[10px] font-bold text-slate-500">Produk</span>'}
-                <span class="min-w-0"><strong class="block truncate">${escapeHtml(product.name)}</strong><small>${escapeHtml(product.category || 'Produk')} · ${product.stock < 1 ? 'Stok habis' : `Stok ${product.stock}`}</small></span>
+                <span class="min-w-0"><strong class="block truncate">${escapeHtml(product.name)}</strong><small>${product.barcode ? `Barcode ${escapeHtml(product.barcode)} · ` : ''}${escapeHtml(product.category || 'Produk')} · ${product.stock < 1 ? 'Stok habis' : `Stok ${product.stock}`}</small></span>
             </span>
             <strong>${product.stock < 1 ? 'Habis' : rupiah(product.price)}</strong>
         </button>
@@ -133,7 +133,7 @@ function renderResults() {
 function renderProductGrid(keyword = '') {
     if (!productGrid) return;
 
-    const matches = products.filter((product) => !keyword || [product.name, product.category || '', product.id]
+    const matches = products.filter((product) => !keyword || [product.name, product.category || '', product.barcode || '', product.id]
         .some((field) => String(field).toLowerCase().includes(keyword)));
     const visibleProducts = matches.slice(0, 12);
     productGridCount.textContent = matches.length > visibleProducts.length
@@ -222,13 +222,20 @@ function resetTransaction() {
 searchInput.addEventListener('input', renderResults);
 searchInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
+        event.preventDefault();
+        const keyword = searchInput.value.trim().toLowerCase();
+        const exactBarcode = products.find((product) => product.barcode?.toLowerCase() === keyword);
         const firstResult = resultsBox.querySelector('[data-product-id]');
-        if (firstResult) addToCart(firstResult.dataset.productId);
+        if (exactBarcode) addToCart(exactBarcode.id);
+        else if (firstResult) addToCart(firstResult.dataset.productId);
     }
 });
 document.getElementById('searchButton').addEventListener('click', () => {
+    const keyword = searchInput.value.trim().toLowerCase();
+    const exactBarcode = products.find((product) => product.barcode?.toLowerCase() === keyword);
     const firstResult = resultsBox.querySelector('[data-product-id]');
-    if (firstResult) addToCart(firstResult.dataset.productId);
+    if (exactBarcode) addToCart(exactBarcode.id);
+    else if (firstResult) addToCart(firstResult.dataset.productId);
     else renderResults();
 });
 resultsBox.addEventListener('click', (event) => {
@@ -428,3 +435,4 @@ heldTransactions = readHeldTransactions();
 renderHeldTransactions();
 renderCart();
 renderProductGrid();
+searchInput.focus();

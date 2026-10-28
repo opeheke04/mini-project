@@ -18,6 +18,7 @@ class ProductCreateTest extends TestCase
             ->actingAs($user)
             ->post('/products', [
                 'name' => 'Laptop Gaming',
+                'barcode' => '8991234567890',
                 'category' => 'Elektronik',
                 'description' => 'Laptop untuk kebutuhan gaming dan kerja.',
                 'price' => 12500000,
@@ -31,10 +32,28 @@ class ProductCreateTest extends TestCase
 
         $this->assertDatabaseHas('products', [
             'name' => 'Laptop Gaming',
+            'barcode' => '8991234567890',
             'category' => 'Elektronik',
             'price' => 12500000.00,
             'stock' => 10,
             'is_active' => true,
         ]);
+    }
+
+    public function test_product_barcode_must_be_unique(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        \App\Models\Product::factory()->create(['barcode' => '8991234567890']);
+
+        $this->actingAs($admin)
+            ->from('/products/create')
+            ->post('/products', [
+                'name' => 'Produk Duplikat',
+                'barcode' => '8991234567890',
+                'price' => 1000,
+                'stock' => 1,
+            ])
+            ->assertRedirect('/products/create')
+            ->assertSessionHasErrors('barcode');
     }
 }

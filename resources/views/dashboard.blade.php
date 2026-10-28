@@ -170,9 +170,12 @@
                         <h3 class="font-black text-slate-900">Perlu perhatian</h3>
                         <p class="mt-1 text-xs text-slate-500">Produk aktif dengan stok {{ $lowStockThreshold }} unit atau kurang</p>
                     </div>
-                    <a href="{{ route('products.index', ['stock' => 'low']) }}" class="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-amber-800 hover:text-amber-950">
-                        Lihat semua <span aria-hidden="true">→</span>
-                    </a>
+                    <div class="flex shrink-0 flex-col items-end gap-2">
+                        <a href="{{ route('stock-restocks.index') }}" class="text-xs font-bold text-amber-800 hover:text-amber-950">Catat restock</a>
+                        <a href="{{ route('products.index', ['stock' => 'low']) }}" class="inline-flex items-center gap-1 text-xs font-bold text-slate-600 hover:text-slate-950">
+                            Lihat semua <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
                 </div>
                 @if ($lowStockProducts->isEmpty())
                     <div class="flex items-center gap-3 px-5 py-7 sm:px-6">

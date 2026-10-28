@@ -56,10 +56,42 @@ Open the URL shown by Artisan (normally `http://127.0.0.1:8000`). For frontend d
 ## Roles and main routes
 
 - Admins can access `/admin/dashboard` and `/products`.
+- Products can have an optional unique barcode. On the cashier screen, search by barcode or scan it with a keyboard-style barcode scanner; pressing Enter adds the matching product to the cart.
+- Admins can access `/stock-restocks` to record incoming inventory and review its history.
 - Admins can access `/sales` for searchable transaction history, transaction details, and daily/monthly sales summaries.
 - Admins and cashiers can access `/cashier` and record transactions.
 - The `admin` and `cek.role` middleware enforce the role restrictions.
 - Public registration is disabled. Admins can create cashier accounts from the **Akun Kasir** menu; new accounts require a password of at least 16 characters containing letters and numbers.
+
+## Restock and mobile app
+
+Admins can record incoming stock from **Restock** in the web navigation or at `/stock-restocks`. Each entry stores the product name, quantity, received date, supplier, notes, and admin who recorded it. Stock updates and the history entry are written in one database transaction. The responsive page is available on desktop and mobile browsers.
+
+The `mobile` Flutter project provides an Android/iOS admin app for viewing stock, recording restocks, and reviewing recent restock history. Its Sanctum API is restricted to admin accounts:
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/api/mobile/login` | Sign in and receive a scoped mobile token |
+| `GET` | `/api/mobile/me` | Read the signed-in admin profile |
+| `POST` | `/api/mobile/logout` | Revoke the current mobile token |
+| `GET` | `/api/mobile/products` | Read products and the configured low-stock threshold |
+| `GET` | `/api/mobile/restocks` | Read paginated restock history |
+| `POST` | `/api/mobile/restocks` | Record a restock and atomically update its product stock |
+
+After running the database migrations and starting Laravel, run the app on an Android emulator with:
+
+```powershell
+cd mobile
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000/api/mobile
+```
+
+For a physical Android device, start Laravel with `php artisan serve --host 0.0.0.0` and set `API_BASE_URL` to the computer's LAN address, for example `http://192.168.1.20:8000/api/mobile`; allow the port through the local firewall as needed. iOS builds and simulator/device runs require macOS and Xcode. Cleartext HTTP is enabled only in the Android debug manifest. Mobile API tokens are scoped to inventory access, expire after 30 days, and are revoked when the user signs out.
+
+```powershell
+flutter build apk --debug --dart-define=API_BASE_URL=http://192.168.1.20:8000/api/mobile
+```
+
+The generated Android project is ready for debug testing; release signing is not configured. Before distributing an app, configure a private release keystore, build with an HTTPS API URL, and keep signing credentials out of source control.
 
 ## Laravel Books API (Acara 25-26)
 

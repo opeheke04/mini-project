@@ -12,6 +12,18 @@
 </div>
 
 <div>
+    <label class="block text-sm font-semibold text-slate-700" for="barcode">
+        Barcode
+    </label>
+    <input id="barcode" name="barcode" type="text" maxlength="64" inputmode="numeric"
+           value="{{ old('barcode', $product->barcode ?? '') }}" autocomplete="off">
+    <p class="mt-1 text-xs text-slate-500">Opsional. Isi atau scan barcode produk; nilainya harus unik.</p>
+    @error('barcode')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+</div>
+
+<div>
     <label class="block text-sm font-semibold text-slate-700" for="category">
         Kategori
     </label>

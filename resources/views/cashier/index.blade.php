@@ -55,7 +55,7 @@
                                 </span>
                                 <div>
                                 <h3 class="font-black text-slate-900">Tambah Barang</h3>
-                                <p class="mt-1 text-xs text-slate-500">Cari berdasarkan nama atau kategori barang.</p>
+                                <p class="mt-1 text-xs text-slate-500">Cari nama, kategori, atau scan barcode dengan scanner.</p>
                                 </div>
                             </div>
                             <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">F2 Cari</span>
@@ -65,7 +65,7 @@
                         <div class="relative flex gap-3">
                             <div class="relative min-w-0 flex-1">
                                 <label for="searchProduct" class="sr-only">Cari produk</label>
-                                <input id="searchProduct" type="search" autocomplete="off" class="w-full rounded-xl border-slate-200 bg-slate-50 py-3 pl-4 pr-4 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500" placeholder="Cari nama atau kategori barang...">
+                                <input id="searchProduct" type="search" autocomplete="off" class="w-full rounded-xl border-slate-200 bg-slate-50 py-3 pl-4 pr-4 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500" placeholder="Cari nama, kategori, atau scan barcode...">
                                 <div id="productResults" class="absolute inset-x-0 top-full z-20 mt-2 hidden max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl"></div>
                             </div>
                             <button type="button" id="searchButton" class="btn-primary shrink-0 px-5">Cari</button>

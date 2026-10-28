@@ -23,6 +23,9 @@
                         <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-800">
                             {{ __('Produk') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('stock-restocks.index')" :active="request()->routeIs('stock-restocks.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-800">
+                            {{ __('Restock') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-amber-700 dark:text-slate-300 dark:hover:text-white">
                             {{ __('Penjualan') }}
                         </x-nav-link>
@@ -92,6 +95,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                     {{ __('Produk') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('stock-restocks.index')" :active="request()->routeIs('stock-restocks.*')">
+                    {{ __('Restock') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
                     {{ __('Penjualan') }}

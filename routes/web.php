@@ -1,11 +1,13 @@
 <?php
 
-use App\Http\Controllers\CashierController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\CashierAccountController;
+use App\Http\Controllers\CashierController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CashierAccountController;
 use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\StockRestockController;
+use App\Http\Controllers\StoreSettingsController;
 use App\Http\Controllers\StrukController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +24,7 @@ Route::get('/dashboard', function () {
 Route::get('/admin/dashboard', AdminDashboardController::class)->middleware('admin')->name('admin.dashboard');
 
 Route::get('/admin', function () {
-    return "Selamat datang di halaman admin!";
+    return 'Selamat datang di halaman admin!';
 })->middleware('admin')->name('admin.middleware-demo');
 
 Route::get('/role-check', function () {
@@ -40,11 +42,13 @@ Route::middleware(['auth', 'cek.role:admin,kasir'])->group(function () {
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('products', ProductController::class);
+    Route::get('/stock-restocks', [StockRestockController::class, 'index'])->name('stock-restocks.index');
+    Route::post('/stock-restocks', [StockRestockController::class, 'store'])->name('stock-restocks.store');
     Route::get('/admin/cashier-accounts', [CashierAccountController::class, 'index'])->name('admin.cashier-accounts.index');
     Route::post('/admin/cashier-accounts', [CashierAccountController::class, 'store'])->name('admin.cashier-accounts.store');
-    Route::get('/admin/store-settings', [\App\Http\Controllers\StoreSettingsController::class, 'index'])->name('admin.store-settings.index');
-    Route::post('/admin/store-settings', [\App\Http\Controllers\StoreSettingsController::class, 'update'])->name('admin.store-settings.update');
-    Route::post('/admin/store-settings/test-print', [\App\Http\Controllers\StoreSettingsController::class, 'testPrint'])->name('admin.store-settings.test-print');
+    Route::get('/admin/store-settings', [StoreSettingsController::class, 'index'])->name('admin.store-settings.index');
+    Route::post('/admin/store-settings', [StoreSettingsController::class, 'update'])->name('admin.store-settings.update');
+    Route::post('/admin/store-settings/test-print', [StoreSettingsController::class, 'testPrint'])->name('admin.store-settings.test-print');
     Route::get('/sales', [SalesReportController::class, 'index'])->name('sales.index');
     Route::get('/sales/{sale}', [SalesReportController::class, 'show'])->name('sales.show');
 });

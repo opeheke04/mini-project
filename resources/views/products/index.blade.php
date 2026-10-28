@@ -10,9 +10,14 @@
                 </h2>
             </div>
 
-            <a href="{{ route('products.create') }}" class="btn-primary">
-                {{ __('Tambah Produk') }}
-            </a>
+            <div class="flex flex-col gap-2 sm:flex-row">
+                <a href="{{ route('stock-restocks.index') }}" class="btn-secondary text-center">
+                    {{ __('Catat Restock') }}
+                </a>
+                <a href="{{ route('products.create') }}" class="btn-primary text-center">
+                    {{ __('Tambah Produk') }}
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -37,6 +42,7 @@
                         <thead>
                             <tr class="text-left text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
                                 <th class="px-4 py-3">Produk</th>
+                                <th class="px-4 py-3">Barcode</th>
                                 <th class="px-4 py-3">Kategori</th>
                                 <th class="px-4 py-3">Harga</th>
                                 <th class="px-4 py-3">Stok</th>
@@ -51,6 +57,7 @@
                                     <td class="rounded-l-xl px-4 py-4 font-semibold text-slate-800">
                                         {{ $product->name }}
                                     </td>
+                                    <td class="px-4 py-4 font-mono text-xs">{{ $product->barcode ?: '-' }}</td>
                                     <td class="px-4 py-4">{{ $product->category ?: '-' }}</td>
                                     <td class="px-4 py-4 font-semibold text-slate-800">
                                         Rp {{ number_format((float) $product->price, 0, ',', '.') }}
@@ -100,7 +107,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-4 py-16 text-center text-slate-500">
+                                    <td colspan="8" class="px-4 py-16 text-center text-slate-500">
                                         <div class="rounded-2xl border border-dashed border-amber-300 bg-amber-50/40 p-8">
                                             Belum ada produk. Tambahkan produk pertama untuk mulai mengelola inventaris.
                                         </div>

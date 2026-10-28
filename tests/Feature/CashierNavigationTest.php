@@ -16,6 +16,7 @@ class CashierNavigationTest extends TestCase
         $user = User::factory()->create(['role' => 'kasir']);
         Product::factory()->create([
             'name' => 'Indomie Goreng',
+            'barcode' => '8991234567890',
             'price' => 3500,
             'stock' => 10,
             'is_active' => true,
@@ -30,6 +31,7 @@ class CashierNavigationTest extends TestCase
             ->assertOk()
             ->assertSeeText('Transaksi Kasir')
             ->assertSeeText('Indomie Goreng')
+            ->assertSee('8991234567890', false)
             ->assertSeeText('Pilih Produk')
             ->assertSee('indomie.webp', false)
             ->assertSeeText('Bayar');
