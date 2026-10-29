@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\ImageManager;
+use RuntimeException;
 
 class ProductController extends Controller
 {
@@ -64,20 +67,7 @@ class ProductController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('image')) {
-            $imageFile = $request->file('image');
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read($imageFile->getRealPath());
-
-            $image->cover(800, 800);
-
-            Storage::disk('public')->makeDirectory('products');
-
-            $filename = time() . '_' . Str::random(10) . '.jpg';
-            $path = 'products/' . $filename;
-
-            Storage::disk('public')->put($path, (string) $image->toJpeg(90));
-
-            $validated['image'] = $path;
+            $validated['image'] = $this->storeProductImage($request->file('image'));
         }
 
         Product::create($validated);
@@ -122,22 +112,11 @@ class ProductController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('image')) {
+            $path = $this->storeProductImage($request->file('image'));
+
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
-
-            $imageFile = $request->file('image');
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read($imageFile->getRealPath());
-
-            $image->cover(800, 800);
-
-            Storage::disk('public')->makeDirectory('products');
-
-            $filename = time() . '_' . Str::random(10) . '.jpg';
-            $path = 'products/' . $filename;
-
-            Storage::disk('public')->put($path, (string) $image->toJpeg(90));
 
             $validated['image'] = $path;
         }
@@ -163,5 +142,42 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('success', 'Produk berhasil dihapus.');
+    }
+
+    private function storeProductImage(UploadedFile $imageFile): string
+    {
+        $disk = Storage::disk('public');
+        $driver = match (true) {
+            extension_loaded('gd') => new GdDriver(),
+            extension_loaded('imagick') => new ImagickDriver(),
+            default => null,
+        };
+
+        if ($driver !== null) {
+            $image = (new ImageManager($driver))
+                ->read($imageFile->getRealPath())
+                ->cover(800, 800);
+
+            $filename = time() . '_' . Str::random(10) . '.jpg';
+            $path = 'products/' . $filename;
+
+            $disk->makeDirectory('products');
+
+            if (! $disk->put($path, (string) $image->toJpeg(90))) {
+                throw new RuntimeException('Gagal menyimpan foto produk.');
+            }
+
+            return $path;
+        }
+
+        $extension = $imageFile->guessExtension() ?: $imageFile->getClientOriginalExtension();
+        $filename = time() . '_' . Str::random(10) . '.' . $extension;
+        $path = $disk->putFileAs('products', $imageFile, $filename);
+
+        if (! is_string($path)) {
+            throw new RuntimeException('Gagal menyimpan foto produk.');
+        }
+
+        return $path;
     }
 }
