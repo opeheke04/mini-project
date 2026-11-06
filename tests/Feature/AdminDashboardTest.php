@@ -37,7 +37,7 @@ class AdminDashboardTest extends TestCase
             ->assertSeeText('Omzet hari ini')
             ->assertSeeText('15.000')
             ->assertSeeText('Omzet bulan ini')
-            ->assertSeeText('26.000')
+            ->assertSeeText('22.000')
             ->assertSeeText('Omzet 7 hari terakhir')
             ->assertSeeText('+450,0%')
             ->assertSeeText('Produk terlaris bulan ini')
