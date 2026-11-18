@@ -24,7 +24,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/admin/dashboard', AdminDashboardController::class)->middleware('admin')->name('admin.dashboard');
 
-Route::get('/admin', function () {
+Route::get('/admin/demo', function () {
     return 'Selamat datang di halaman admin!';
 })->middleware('admin')->name('admin.middleware-demo');
 

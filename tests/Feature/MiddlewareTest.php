@@ -12,7 +12,7 @@ class MiddlewareTest extends TestCase
 
     public function test_guest_is_redirected_to_login_from_admin_route(): void
     {
-        $this->get('/admin')->assertRedirect('/login');
+        $this->get('/admin/demo')->assertRedirect('/login');
     }
 
     public function test_admin_can_access_admin_route(): void
@@ -20,7 +20,7 @@ class MiddlewareTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($admin)
-            ->get('/admin')
+            ->get('/admin/demo')
             ->assertOk()
             ->assertSeeText('Selamat datang di halaman admin!');
     }
@@ -29,7 +29,7 @@ class MiddlewareTest extends TestCase
     {
         $cashier = User::factory()->create(['role' => 'kasir']);
 
-        $this->actingAs($cashier)->get('/admin')->assertForbidden();
+        $this->actingAs($cashier)->get('/admin/demo')->assertForbidden();
     }
 
     public function test_role_parameter_allows_matching_user(): void
